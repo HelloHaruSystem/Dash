@@ -1,4 +1,9 @@
+using Dash.Infrastructure.DependencyInjection;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Add Infrastructure (DbContext, Options, etc)
+builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddOpenApi();
 
