@@ -8,15 +8,15 @@ public sealed record User
 
     [Required]
     [MaxLength(50)]
-    public string Username { get; set; }
+    public string Username { get; set; } = null!;
 
     [Required]
     [MaxLength(255)]
     [EmailAddress]
-    public string Email { get; set; }
+    public string Email { get; set; } = null!;
 
     [Required]
-    public string PasswordHash { get; set; }
+    public string PasswordHash { get; set; } = null!;
 
     // Email Verification
     public bool EmailVerified { get; set; } = false;
@@ -48,5 +48,5 @@ public sealed record User
     public DateTime PasswordResetExpiresAt { get; set; }
 
     // Navigation properties
-    public ICollection<LoginAttempt> LoginAttempts { get; set; }
+    public ICollection<LoginAttempt> LoginAttempts { get; set; } = null!;
 }
