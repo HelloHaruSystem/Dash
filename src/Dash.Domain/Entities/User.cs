@@ -26,7 +26,7 @@ public sealed class User
     public bool IsActive { get; set; } = true;
 
     // Timestamps
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; set; }
     public DateTime? LastLoginAt { get; set; }
     public DateTime? PasswordChangedAt { get; set; }
 

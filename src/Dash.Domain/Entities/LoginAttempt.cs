@@ -8,7 +8,7 @@ public sealed class LoginAttempt
 
     public int UserId { get; set; }
 
-    public DateTime AttemptedAt { get; set; } = DateTime.UtcNow;
+    public DateTime AttemptedAt { get; set; }
 
     [MaxLength(45)]
     public string IpAddress { get; set; } = null!;
