@@ -5,7 +5,12 @@ obj/
 .idea/
 .vscode/
 
-publish/
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+...
 
 # SQLite database files
 *.db
