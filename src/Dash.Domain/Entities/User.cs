@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Dash.Domain.Entities;
 
-public record User
+public sealed record User
 {
     public int Id { get; set; }
 
@@ -48,4 +48,5 @@ public record User
     public DateTime PasswordResetExpiresAt { get; set; }
 
     // Navigation properties
+    public ICollection<LoginAttempt> LoginAttempts { get; set; }
 }
