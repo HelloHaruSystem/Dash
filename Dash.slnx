@@ -2,5 +2,6 @@
   <Folder Name="/src/">
     <Project Path="src/Dash.Api/Dash.Api.csproj" />
     <Project Path="src/Dash.Domain/Dash.Domain.csproj" />
+    <Project Path="src/Dash.Infrastructure/Dash.Infrastructure.csproj" />
   </Folder>
 </Solution>
