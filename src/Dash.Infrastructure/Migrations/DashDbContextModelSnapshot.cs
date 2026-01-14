@@ -100,10 +100,10 @@ namespace Dash.Infrastructure.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("last_login_at");
 
-                    b.Property<string>("LastLoginIP")
+                    b.Property<string>("LastLoginIp")
                         .HasMaxLength(45)
                         .HasColumnType("TEXT")
-                        .HasColumnName("last_login_i_p");
+                        .HasColumnName("last_login_ip");
 
                     b.Property<DateTime?>("PasswordChangedAt")
                         .HasColumnType("TEXT")

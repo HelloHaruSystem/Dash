@@ -41,7 +41,7 @@ public sealed class User
     public int FailedLoginAttempts { get; set; } = 0;
 
     [MaxLength(45)] // IPv6 MaxLength
-    public string? LastLoginIP { get; set; }
+    public string? LastLoginIp { get; set; }
 
     // Password Reset
     public string? PasswordResetTokenHash { get; set; }

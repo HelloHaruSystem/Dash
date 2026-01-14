@@ -29,7 +29,7 @@ namespace Dash.Infrastructure.Migrations
                     timezone = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
                     preferred_language = table.Column<string>(type: "TEXT", maxLength: 10, nullable: true),
                     failed_login_attempts = table.Column<int>(type: "INTEGER", nullable: false),
-                    last_login_i_p = table.Column<string>(type: "TEXT", maxLength: 45, nullable: true),
+                    last_login_ip = table.Column<string>(type: "TEXT", maxLength: 45, nullable: true),
                     password_reset_token_hash = table.Column<string>(type: "TEXT", nullable: true),
                     password_reset_expires_at = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },

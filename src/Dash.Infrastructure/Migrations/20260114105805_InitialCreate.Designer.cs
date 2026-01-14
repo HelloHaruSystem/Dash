@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dash.Infrastructure.Migrations
 {
     [DbContext(typeof(DashDbContext))]
-    [Migration("20260112152129_InitialCreate")]
+    [Migration("20260114105805_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -103,10 +103,10 @@ namespace Dash.Infrastructure.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("last_login_at");
 
-                    b.Property<string>("LastLoginIP")
+                    b.Property<string>("LastLoginIp")
                         .HasMaxLength(45)
                         .HasColumnType("TEXT")
-                        .HasColumnName("last_login_i_p");
+                        .HasColumnName("last_login_ip");
 
                     b.Property<DateTime?>("PasswordChangedAt")
                         .HasColumnType("TEXT")
