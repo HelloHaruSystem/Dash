@@ -1,5 +1,5 @@
-bin/
-obj/
+**bin/
+**obj/
 
 .vs/
 .idea/
@@ -7,9 +7,7 @@ obj/
 
 # Build results
 [Dd]ebug/
-[Dd]ebugPublic/
 [Rr]elease/
-[Rr]eleases/
 
 # SQLite database files
 *.db
