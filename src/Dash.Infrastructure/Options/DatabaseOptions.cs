@@ -7,3 +7,4 @@ public class DatabaseOptions
     public required string Provider { get; set; }
     public required string ConnectionString { get; set; }
 }
+
