@@ -10,7 +10,6 @@ obj/
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
-...
 
 # SQLite database files
 *.db
