@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Dash.Infrastructure\Dash.Infrastructure.csproj" />
+    <ProjectReference Include="..\Dash.Application\Dash.Application.csproj" />
   </ItemGroup>
 
 </Project>
