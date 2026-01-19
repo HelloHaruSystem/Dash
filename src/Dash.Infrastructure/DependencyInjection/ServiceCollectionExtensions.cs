@@ -1,6 +1,8 @@
+using Dash.Application.Common.Persistence;
 using Dash.Infrastructure.Data;
 using Dash.Infrastructure.Enums;
 using Dash.Infrastructure.Options;
+using Dash.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -46,6 +48,9 @@ public static class ServiceCollectionExtensions
                     $"Unsupported database provider: {databaseOptions.Provider}. " +
                     "Supported providers are: Sqlite, PostgreSQL");
         }
+
+        // Add Repositories
+        services.AddScoped<IUserRepository, UserRepository>();
 
         return services;
     }

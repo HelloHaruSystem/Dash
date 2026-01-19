@@ -39,5 +39,5 @@ public sealed class UserRepository : IUserRepository
         _context.Users.Remove(user);
 
     public async Task SaveChangesAsync() =>
-        await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 }
