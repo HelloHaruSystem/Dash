@@ -5,6 +5,9 @@ namespace Dash.Application.Features.Authentication.Mappings;
 
 internal static class UserMappings
 {
+    /// <summary>
+    /// Maps a RegisterRquest DTO to a user entity
+    /// </summary>
     public static User ToEntity(this RegisterRequest request, string passwordHash)
     {
         return new User
