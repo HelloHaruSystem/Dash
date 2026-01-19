@@ -9,7 +9,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         // register services ehre
-        services.AddScoped<IPasswordService, PasswordService>();
+        services.AddSingleton<IPasswordService, PasswordService>();
 
         return services;
     }

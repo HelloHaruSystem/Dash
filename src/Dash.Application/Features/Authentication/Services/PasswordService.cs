@@ -3,13 +3,13 @@ using Dash.Application.Features.Authentication.Interfaces;
 
 namespace Dash.Application.Features.Authentication.Services;
 
-public class PasswordService : IPasswordService
+public sealed class PasswordService : IPasswordService
 {
     private const int SaltSize = 32;        // 256 bits
     private const int HashSize = 32;        // 256 bits
     private const int Iterations = 600000;  // OWASP recommendation
 
-    public string HashPassword(string password)
+    public Task<string> HashPasswordAsync(string password)
     {
         // Generate a random salt
         byte[] salt = RandomNumberGenerator.GetBytes(SaltSize);
@@ -29,10 +29,10 @@ public class PasswordService : IPasswordService
         Array.Copy(salt, 0, combined, 0, SaltSize);
         Array.Copy(hash, 0, combined, SaltSize, HashSize);
 
-        return Convert.ToBase64String(combined);
+        return Task.FromResult(Convert.ToBase64String(combined));
     }
 
-    public bool VerifyPassword(string password, string passwordHash)
+    public Task<bool> VerifyPasswordAsync(string password, string passwordHash)
     {
         // Convert the stored hash back to bytes
         byte[] combined = Convert.FromBase64String(passwordHash);
@@ -55,6 +55,7 @@ public class PasswordService : IPasswordService
        );
 
         // compare the two hashes
-        return CryptographicOperations.FixedTimeEquals(storedHash, testHash);
+        bool isValid = CryptographicOperations.FixedTimeEquals(storedHash, testHash);
+        return Task.FromResult(isValid);
     }
 }

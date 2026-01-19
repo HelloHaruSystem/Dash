@@ -3,7 +3,7 @@ using Dash.Domain.Entities;
 
 namespace Dash.Application.Features.Authentication.Mappings;
 
-public static class UserMappings
+internal static class UserMappings
 {
     public static User ToEntity(this RegisterRequest request, string passwordHash)
     {
@@ -12,11 +12,6 @@ public static class UserMappings
             Username = request.Username,
             Email = request.Email,
             PasswordHash = passwordHash,
-            EmailVerified = false,
-            IsActive = true,
-            CreatedAt = DateTime.Now,
-            PreferredLanguage = "en",
-            FailedLoginAttempts = 0
         };
     }
 }

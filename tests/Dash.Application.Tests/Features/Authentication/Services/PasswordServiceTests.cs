@@ -12,35 +12,35 @@ public class PasswordServiceTests
     }
 
     [Fact]
-    public void HashPassword_ShouldReturnNonEmptyString()
+    public async Task HashPasswordAsync_ShouldReturnNonEmptyString()
     {
         string password = "NewTestPassword123";
 
-        string hash = _passwordService.HashPassword(password);
+        string hash = await _passwordService.HashPasswordAsync(password);
 
         Assert.NotNull(hash);
         Assert.NotEmpty(hash);
     }
 
     [Fact]
-    public void HashPassword_SamePasswordTwice_ShouldProduceDifferentHashes()
+    public async Task HashPasswordAsync_SamePasswordTwice_ShouldProduceDifferentHashes()
     {
         string password = "NewTestPassword123";
 
-        string hash1 = _passwordService.HashPassword(password);
-        string hash2 = _passwordService.HashPassword(password);
+        string hash1 = await _passwordService.HashPasswordAsync(password);
+        string hash2 = await _passwordService.HashPasswordAsync(password);
 
         Assert.NotEqual(hash1, hash2);
     }
 
     [Fact]
-    public void VerifyPassword_WithCorrectPassword_ShouldReturnTrue()
+    public async Task VerifyPasswordAsync_WithCorrectPassword_ShouldReturnTrue()
     {
         string password = "NewTestPassword123";
         string wrongPassword = "WrongTestPassword123";
-        string hash = _passwordService.HashPassword(password);
+        string hash = await _passwordService.HashPasswordAsync(password);
 
-        bool result = _passwordService.VerifyPassword(wrongPassword, hash);
+        bool result = await _passwordService.VerifyPasswordAsync(wrongPassword, hash);
 
         Assert.False(result);
     }
@@ -49,14 +49,14 @@ public class PasswordServiceTests
     [InlineData("")]
     [InlineData("a")]
     [InlineData("LongPassWordWithSpecialCharactersIncluded!@#$%^&*()123456")]
-    public void HashPassword_WithVariousPasswords_ShouldSucceed(string password)
+    public async Task HashPasswordAsync_WithVariousPasswords_ShouldSucceed(string password)
     {
-        string hash = _passwordService.HashPassword(password);
+        string hash = await _passwordService.HashPasswordAsync(password);
 
         Assert.NotNull(hash);
         Assert.NotEmpty(hash);
 
-        bool isValid = _passwordService.VerifyPassword(password, hash);
+        bool isValid = await _passwordService.VerifyPasswordAsync(password, hash);
         Assert.True(isValid);
     }
 }

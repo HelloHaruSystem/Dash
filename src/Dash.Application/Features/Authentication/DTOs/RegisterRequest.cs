@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Dash.Application.Features.Authentication.DTOs;
 
-public class RegisterRequest
+public sealed record RegisterRequest
 {
     [Required]
     [MaxLength(50)]

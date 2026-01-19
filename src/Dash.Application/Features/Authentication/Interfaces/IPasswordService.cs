@@ -2,6 +2,6 @@ namespace Dash.Application.Features.Authentication.Interfaces;
 
 public interface IPasswordService
 {
-    string HashPassword(string password);
-    bool VerifyPassword(string password, string passwordHash);
+    Task<string> HashPasswordAsync(string password);
+    Task<bool> VerifyPasswordAsync(string password, string passwordHash);
 }
