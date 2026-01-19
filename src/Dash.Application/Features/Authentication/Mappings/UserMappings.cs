@@ -17,4 +17,18 @@ internal static class UserMappings
             PasswordHash = passwordHash,
         };
     }
+
+    /// <summary>
+    /// Maps a User entity to an AuthResponse DTO
+    /// </summary>
+    public static AuthResponse ToAuthResponse(this User user, string token)
+    {
+        return new AuthResponse
+        {
+            Id = user.Id,
+            Username = user.Username,
+            Email = user.Email,
+            Token = token
+        };
+    }
 }
