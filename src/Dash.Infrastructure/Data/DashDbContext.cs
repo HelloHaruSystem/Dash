@@ -11,8 +11,8 @@ public sealed class DashDbContext : DbContext
     {
     }
 
-    public DbSet<User> Users { get; set; } = null!;
-    public DbSet<LoginAttempt> LoginAttempts { get; set; } = null!;
+    public DbSet<User> Users => Set<User>();
+    public DbSet<LoginAttempt> LoginAttempts => Set<LoginAttempt>();
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {

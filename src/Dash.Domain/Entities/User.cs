@@ -48,5 +48,5 @@ public sealed class User
     public DateTime? PasswordResetExpiresAt { get; set; }
 
     // Navigation properties
-    public ICollection<LoginAttempt> LoginAttempts { get; set; } = null!;
+    public ICollection<LoginAttempt> LoginAttempts { get; set; } = [];
 }

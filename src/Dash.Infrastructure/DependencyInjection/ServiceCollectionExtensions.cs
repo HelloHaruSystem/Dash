@@ -1,4 +1,5 @@
 using Dash.Infrastructure.Data;
+using Dash.Infrastructure.Enums;
 using Dash.Infrastructure.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -27,16 +28,19 @@ public static class ServiceCollectionExtensions
         // Register DbContext based on provider
         switch (databaseOptions.Provider)
         {
-            case "Sqlite":
+            case DatabaseProvider.Sqlite:
                 services.AddDbContext<DashDbContext>(options =>
-                    options.UseSqlite(databaseOptions.ConnectionString));
+                    options.UseSqlite(databaseOptions.ConnectionString,
+                        x => x.MigrationsHistoryTable("__ef_migrations_history")));
                 break;
 
-            case "PostgreSQL":
+            case DatabaseProvider.PostgreSQL:
                 services.AddDbContext<DashDbContext>(options =>
-                    options.UseNpgsql(databaseOptions.ConnectionString));
+                    options.UseNpgsql(databaseOptions.ConnectionString,
+                        x => x.MigrationsHistoryTable("__ef_migrations_history")));
                 break;
 
+            case DatabaseProvider.None:
             default:
                 throw new InvalidOperationException(
                     $"Unsupported database provider: {databaseOptions.Provider}. " +
