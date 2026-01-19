@@ -2,18 +2,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Dash.Application.Features.Authentication.DTOs;
 
-public sealed record RegisterRequest
+public sealed record LoginRequest
 {
     [Required]
-    [MaxLength(50)]
-    public required string Username { get; init; }
-
-    [Required]
     [EmailAddress]
-    [MaxLength(255)]
     public required string Email { get; init; }
 
     [Required]
-    [MinLength(8)]
     public required string Password { get; init; }
 }
