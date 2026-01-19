@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Dash.Application.DTOs.Authentication;
+namespace Dash.Application.Features.Authentication.DTOs;
 
 public class RegisterRequest
 {

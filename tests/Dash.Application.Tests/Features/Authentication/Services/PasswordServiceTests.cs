@@ -1,6 +1,6 @@
-using Dash.Application.Services;
+using Dash.Application.Features.Authentication.Services;
 
-namespace Dash.Application.Tests.Services;
+namespace Dash.Application.Tests.Features.Authentication.Services;
 
 public class PasswordServiceTests
 {

@@ -1,5 +1,5 @@
-using Dash.Application.Interfaces;
-using Dash.Application.Services;
+using Dash.Application.Features.Authentication.Interfaces;
+using Dash.Application.Features.Authentication.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Dash.Application.DependencyInjection;

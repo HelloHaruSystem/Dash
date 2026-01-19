@@ -1,4 +1,4 @@
-namespace Dash.Application.Interfaces;
+namespace Dash.Application.Features.Authentication.Interfaces;
 
 public interface IPasswordService
 {

@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
-using Dash.Application.Interfaces;
+using Dash.Application.Features.Authentication.Interfaces;
 
-namespace Dash.Application.Services;
+namespace Dash.Application.Features.Authentication.Services;
 
 public class PasswordService : IPasswordService
 {
