@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
 namespace Dash.Infrastructure.Conventions;
 
-public class SnakeCaseNamingConvention : IModelFinalizingConvention
+internal sealed class SnakeCaseNamingConvention : IModelFinalizingConvention
 {
     public void ProcessModelFinalizing(
             IConventionModelBuilder modelBuilder,

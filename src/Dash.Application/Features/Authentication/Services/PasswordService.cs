@@ -3,7 +3,7 @@ using Dash.Application.Features.Authentication.Interfaces;
 
 namespace Dash.Application.Features.Authentication.Services;
 
-public sealed class PasswordService : IPasswordService
+internal sealed class PasswordService : IPasswordService
 {
     private const int SaltSize = 32;        // 256 bits
     private const int HashSize = 32;        // 256 bits

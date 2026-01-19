@@ -1,6 +1,6 @@
 namespace Dash.Infrastructure.Options;
 
-public class DatabaseOptions
+public sealed class DatabaseOptions
 {
     public const string SectionName = "Database";
 

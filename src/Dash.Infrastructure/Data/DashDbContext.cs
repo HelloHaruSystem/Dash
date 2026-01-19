@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Dash.Infrastructure.Data;
 
-public class DashDbContext : DbContext
+public sealed class DashDbContext : DbContext
 {
     public DashDbContext(DbContextOptions<DashDbContext> options)
         : base(options)
