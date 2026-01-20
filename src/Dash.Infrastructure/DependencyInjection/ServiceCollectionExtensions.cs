@@ -1,8 +1,10 @@
 using Dash.Application.Common.Persistence;
+using Dash.Application.Features.Authentication.Interfaces;
 using Dash.Infrastructure.Data;
 using Dash.Infrastructure.Enums;
 using Dash.Infrastructure.Options;
 using Dash.Infrastructure.Persistence.Repositories;
+using Dash.Infrastructure.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -57,6 +59,9 @@ public static class ServiceCollectionExtensions
 
         // Add Repositories
         services.AddScoped<IUserRepository, UserRepository>();
+
+        // Add authentication Services
+        services.AddSingleton<ITokenService, TokenService>();
 
         return services;
     }
