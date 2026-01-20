@@ -65,6 +65,7 @@ public sealed class User
             Username = username,
             Email = email,
             PasswordHash = passwordHash,
+            CreatedAt = DateTime.UtcNow
         };
     }
 }
