@@ -15,8 +15,7 @@ namespace Dash.Infrastructure.Migrations
                 name: "users",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
+                    id = table.Column<Guid>(type: "TEXT", nullable: false),
                     username = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
                     email = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
                     password_hash = table.Column<string>(type: "TEXT", nullable: false),
@@ -42,11 +41,10 @@ namespace Dash.Infrastructure.Migrations
                 name: "login_attempts",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    user_id = table.Column<int>(type: "INTEGER", nullable: false),
+                    id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    user_id = table.Column<Guid>(type: "TEXT", nullable: false),
                     attempted_at = table.Column<DateTime>(type: "TEXT", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP"),
-                    ip_address = table.Column<string>(type: "TEXT", maxLength: 45, nullable: false),
+                    ip_address = table.Column<string>(type: "TEXT", maxLength: 45, nullable: true),
                     user_agent = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
                     is_successful = table.Column<bool>(type: "INTEGER", nullable: false)
                 },

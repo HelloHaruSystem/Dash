@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dash.Infrastructure.Migrations
 {
     [DbContext(typeof(DashDbContext))]
-    [Migration("20260114105805_InitialCreate")]
+    [Migration("20260120122451_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -22,9 +22,9 @@ namespace Dash.Infrastructure.Migrations
 
             modelBuilder.Entity("Dash.Domain.Entities.LoginAttempt", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("TEXT")
                         .HasColumnName("id");
 
                     b.Property<DateTime>("AttemptedAt")
@@ -34,7 +34,6 @@ namespace Dash.Infrastructure.Migrations
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<string>("IpAddress")
-                        .IsRequired()
                         .HasMaxLength(45)
                         .HasColumnType("TEXT")
                         .HasColumnName("ip_address");
@@ -48,8 +47,8 @@ namespace Dash.Infrastructure.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("user_agent");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("INTEGER")
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT")
                         .HasColumnName("user_id");
 
                     b.HasKey("Id")
@@ -66,9 +65,9 @@ namespace Dash.Infrastructure.Migrations
 
             modelBuilder.Entity("Dash.Domain.Entities.User", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("TEXT")
                         .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")

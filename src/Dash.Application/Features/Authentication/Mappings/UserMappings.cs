@@ -10,12 +10,11 @@ internal static class UserMappings
     /// </summary>
     public static User ToEntity(this RegisterRequest request, string passwordHash)
     {
-        return new User
-        {
-            Username = request.Username,
-            Email = request.Email,
-            PasswordHash = passwordHash,
-        };
+        return User.Create(
+            request.Username,
+            request.Email,
+            passwordHash
+        );
     }
 
     /// <summary>
