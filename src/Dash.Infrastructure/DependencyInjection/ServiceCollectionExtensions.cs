@@ -21,6 +21,12 @@ public static class ServiceCollectionExtensions
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
+        // Register and validate Jwt Options
+        services.AddOptions<JwtOptions>()
+            .Bind(configuration.GetSection(JwtOptions.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
         // Get the options for immediate use
         var databaseOptions = configuration
             .GetSection(DatabaseOptions.SectionName)
