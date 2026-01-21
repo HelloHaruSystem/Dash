@@ -21,9 +21,36 @@ public sealed class AuthService : IAuthService
         _tokenService = tokenService;
     }
 
-    public Task<Result<AuthResponse>> LoginAsync(LoginRequest request)
+    public async Task<Result<AuthResponse>> LoginAsync(LoginRequest request)
     {
-        throw new NotImplementedException();
+        // Check if identifier matches a user in the database either by email or username
+        // instead of double cheaking consier adding a method to userRepository to getByIdentifierAsync()
+        var user = await _userRepository.GetByEmailAsync(request.Identifier);
+        if (user is null)
+        {
+            user = await _userRepository.GetByUsernameAsync(request.Identifier);
+            if (user is null)
+            {
+                return Result<AuthResponse>.Failure(UserErrors.InvalidCredentials);
+            }
+        }
+
+        // Check if password matches with the user found
+        // If not a match send the same InvalidCredentials Errors
+        // To not give any information
+        if (!await _passwordService.VerifyPasswordAsync(request.Password, user.PasswordHash))
+        {
+            return Result<AuthResponse>.Failure(UserErrors.InvalidCredentials);
+        }
+
+        // Generate token
+        string token = _tokenService.GenerateToken(user.Id, user.Username, user.Email);
+
+        // Map To AuthResponse
+        AuthResponse response = user.ToAuthResponse(token);
+
+        // Return success result
+        return Result<AuthResponse>.Success(response);
     }
 
     public async Task<Result<AuthResponse>> RegisterAsync(RegisterRequest request)
