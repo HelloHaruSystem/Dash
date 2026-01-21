@@ -17,14 +17,14 @@ public sealed class TokenService : ITokenService
         _options = options.Value;
     }
 
-    public string GenerateToken(Guid Id, string email, string username)
+    public string GenerateToken(Guid Id, string username, string email)
     {
         // Create Claims (user data to embed into the token)
         Claim[] claims = new[]
         {
             new Claim(JwtRegisteredClaimNames.Sub, Id.ToString()),
-            new Claim(JwtRegisteredClaimNames.Email, email),
             new Claim(JwtRegisteredClaimNames.UniqueName, username),
+            new Claim(JwtRegisteredClaimNames.Email, email),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 

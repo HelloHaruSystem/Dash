@@ -5,5 +5,5 @@ public interface ITokenService
     /// <summary>
     /// Generates a JWT token for an atuhenticated user
     /// </summary>
-    public string GenerateToken(Guid Id, string email, string username);
+    public string GenerateToken(Guid Id, string username, string email);
 }
