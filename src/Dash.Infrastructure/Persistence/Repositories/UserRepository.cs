@@ -23,6 +23,9 @@ public sealed class UserRepository : IUserRepository
     public async Task<User?> GetByUsernameAsync(string username) =>
         await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
 
+    public async Task<User?> GetByIdentifierAsync(string identifier) =>
+        await _context.Users.FirstOrDefaultAsync(u => u.Username == identifier || u.Email == identifier);
+
     public async Task<bool> ExistsByEmailAsync(string email) =>
         await _context.Users.AnyAsync(u => u.Email == email);
 

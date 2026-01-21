@@ -8,6 +8,7 @@ public interface IUserRepository
     public Task<User?> GetByIdAsync(Guid id);
     public Task<User?> GetByEmailAsync(string email);
     public Task<User?> GetByUsernameAsync(string username);
+    public Task<User?> GetByIdentifierAsync(string identifier);
 
     // Auth-specific checks
     public Task<bool> ExistsByEmailAsync(string email);

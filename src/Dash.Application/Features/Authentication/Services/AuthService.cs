@@ -24,15 +24,11 @@ public sealed class AuthService : IAuthService
     public async Task<Result<AuthResponse>> LoginAsync(LoginRequest request)
     {
         // Check if identifier matches a user in the database either by email or username
-        // instead of double cheaking consier adding a method to userRepository to getByIdentifierAsync()
-        var user = await _userRepository.GetByEmailAsync(request.Identifier);
+        var user = await _userRepository.GetByIdentifierAsync(request.Identifier);
+
         if (user is null)
         {
-            user = await _userRepository.GetByUsernameAsync(request.Identifier);
-            if (user is null)
-            {
-                return Result<AuthResponse>.Failure(UserErrors.InvalidCredentials);
-            }
+            return Result<AuthResponse>.Failure(UserErrors.InvalidCredentials);
         }
 
         // Check if password matches with the user found
