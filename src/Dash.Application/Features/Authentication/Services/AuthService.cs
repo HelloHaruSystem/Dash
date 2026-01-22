@@ -51,16 +51,16 @@ public sealed class AuthService : IAuthService
 
     public async Task<Result<AuthResponse>> RegisterAsync(RegisterRequest request)
     {
-        // Check if email already exists
-        if (await _userRepository.ExistsByEmailAsync(request.Email))
-        {
-            return Result<AuthResponse>.Failure(UserErrors.EmailAlreadyInUse);
-        }
-
         // Check if username already exists
         if (await _userRepository.ExistsByUsernameAsync(request.Username))
         {
             return Result<AuthResponse>.Failure(UserErrors.UsernameAlreadyInUse);
+        }
+
+        // Check if email already exists
+        if (await _userRepository.ExistsByEmailAsync(request.Email))
+        {
+            return Result<AuthResponse>.Failure(UserErrors.EmailAlreadyInUse);
         }
 
         // Hash the password

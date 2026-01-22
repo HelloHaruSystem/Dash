@@ -113,4 +113,45 @@ public class AuthServiceTests
         Assert.Equal(request.Email, result.Value.Email);
         Assert.Equal("fake-token", result.Value.Token);
     }
+
+    [Fact]
+    public async Task RegisterAsync_WithExistingUsername_ShouldReturnUsernameAlreadyInUse()
+    {
+        RegisterRequest request = new()
+        {
+            Username = "fake-user-name",
+            Email = "fakemail@mail.com",
+            Password = "fake-plain-text-passwprd"
+        };
+
+        _userRepository.ExistsByUsernameAsync(Arg.Any<string>()).Returns(true);
+
+        Result<AuthResponse> result = await _authService.RegisterAsync(request);
+
+        Assert.True(result.IsFailure);
+        Assert.Null(result.Value);
+
+        Assert.Equal(UserErrors.UsernameAlreadyInUse, result.Error);
+    }
+
+    [Fact]
+    public async Task RegisterAsync_WithExistingEmail_ShouldReturnEmailAlreadyInUse()
+    {
+        RegisterRequest request = new()
+        {
+            Username = "fake-user-name",
+            Email = "fakemail@mail.com",
+            Password = "fake-plain-text-passwprd"
+        };
+
+        _userRepository.ExistsByUsernameAsync(Arg.Any<string>()).Returns(false);
+        _userRepository.ExistsByEmailAsync(Arg.Any<string>()).Returns(true);
+
+        Result<AuthResponse> result = await _authService.RegisterAsync(request);
+
+        Assert.True(result.IsFailure);
+        Assert.Null(result.Value);
+
+        Assert.Equal(UserErrors.EmailAlreadyInUse, result.Error);
+    }
 }
