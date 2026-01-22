@@ -88,4 +88,29 @@ public class AuthServiceTests
 
         Assert.Equal(UserErrors.InvalidCredentials, result.Error);
     }
+
+    [Fact]
+    public async Task RegisterAsync_CorrectRegisterRequestShouldReturnSuccessResult()
+    {
+        RegisterRequest request = new()
+        {
+            Username = "fake-user-name",
+            Email = "fakemail@mail.com",
+            Password = "fake-plain-text-passwprd"
+        };
+
+        _userRepository.ExistsByUsernameAsync(Arg.Any<string>()).Returns(false);
+        _userRepository.ExistsByEmailAsync(Arg.Any<string>()).Returns(false);
+        _passwordService.HashPasswordAsync(Arg.Any<string>()).Returns("fake-hashed-password");
+        _tokenService.GenerateToken(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>()).Returns("fake-token");
+
+        Result<AuthResponse> result = await _authService.RegisterAsync(request);
+
+        Assert.True(result.IsSuccess);
+        Assert.NotNull(result.Value);
+
+        Assert.Equal(request.Username, result.Value.Username);
+        Assert.Equal(request.Email, result.Value.Email);
+        Assert.Equal("fake-token", result.Value.Token);
+    }
 }
