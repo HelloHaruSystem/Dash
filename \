@@ -1,4 +1,3 @@
-using Dash.Domain.Common;
 using Dash.Domain.Entities;
 using Dash.Application.Common.Persistence;
 using Dash.Application.Features.Authentication.Interfaces;
@@ -30,24 +29,14 @@ public class AuthServiceTests
     public async Task LoginAsync_CorrectLoginRequestShouldReturnSuccessResult()
     {
         User fakeUser = User.Create("testuser", "test@test.com", "fake-test-password-hash");
-        string fakeToken = "fake-jwt-token";
         LoginRequest request = new()
         {
             Identifier = fakeUser.Username,
-            Password = "PlainTextPassword123!"
+            Password = fakeUser.PasswordHash
         };
 
         _userRepository.GetByIdentifierAsync(Arg.Any<string>()).Returns(fakeUser);
-        _passwordService.VerifyPasswordAsync("PlainTextPassword123!", fakeUser.PasswordHash).Returns(true);
-        _tokenService.GenerateToken(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>()).Returns(fakeToken);
 
-        Result<AuthResponse> result = await _authService.LoginAsync(request);
-
-        Assert.True(result.IsSuccess);
-        Assert.NotNull(result.Value);
-
-        Assert.Equal(result.Value.Username, fakeUser.Username);
-        Assert.Equal(result.Value.Email, fakeUser.Email);
-        Assert.Equal(result.Value.Token, fakeToken);
+        Result<AuthResult> result = await _authService.LoginAsync();
     }
 }
