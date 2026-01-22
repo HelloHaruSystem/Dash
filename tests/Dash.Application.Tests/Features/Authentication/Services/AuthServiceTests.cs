@@ -1,5 +1,6 @@
 using Dash.Domain.Common;
 using Dash.Domain.Entities;
+using Dash.Domain.Errors;
 using Dash.Application.Common.Persistence;
 using Dash.Application.Features.Authentication.Interfaces;
 using Dash.Application.Features.Authentication.Services;
@@ -49,5 +50,42 @@ public class AuthServiceTests
         Assert.Equal(result.Value.Username, fakeUser.Username);
         Assert.Equal(result.Value.Email, fakeUser.Email);
         Assert.Equal(result.Value.Token, fakeToken);
+    }
+
+    [Fact]
+    public async Task LoginAsync_LoginRequestWithWrongIdentifierShouldReturnFailureResult()
+    {
+        LoginRequest request = new()
+        {
+            Identifier = "nonexistent@test.com",
+            Password = "PlainTextPassword123!"
+        };
+
+        Result<AuthResponse> result = await _authService.LoginAsync(request);
+
+        Assert.True(result.IsFailure);
+        Assert.Null(result.Value);
+
+        Assert.Equal(UserErrors.InvalidCredentials, result.Error);
+    }
+
+    [Fact]
+    public async Task LoginAsync_LoginRequestWithWrongPasswordShouldReturnFailureResult()
+    {
+        User fakeUser = User.Create("testuser", "test@test.com", "fake-test-password-hash");
+        LoginRequest request = new()
+        {
+            Identifier = fakeUser.Username,
+            Password = "PlainTextPassword123!"
+        };
+
+        _userRepository.GetByIdentifierAsync(Arg.Any<string>()).Returns(fakeUser);
+
+        Result<AuthResponse> result = await _authService.LoginAsync(request);
+
+        Assert.True(result.IsFailure);
+        Assert.Null(result.Value);
+
+        Assert.Equal(UserErrors.InvalidCredentials, result.Error);
     }
 }
