@@ -22,13 +22,21 @@ internal static class AuthEndpoints
         LoginRequest request,
         IAuthService authService)
     {
-        throw new NotImplementedException();
+        Result<AuthResponse> result = await authService.LoginAsync(request);
+
+        return result.IsSuccess
+            ? TypedResults.Ok(result.Value)
+            : TypedResults.BadRequest(result.Error);
     }
 
-    private static async Task<Results<Ok<AuthResponse>, BadRequest<Error>>> RegisterAsync(
-            LoginRequest request,
+    private static async Task<Results<Ok<AuthResponse>, Conflict<Error>>> RegisterAsync(
+            RegisterRequest request,
             IAuthService authService)
     {
-        throw new NotImplementedException();
+        Result<AuthResponse> result = await authService.RegisterAsync(request);
+
+        return result.IsSuccess
+            ? TypedResults.Ok(result.Value)
+            : TypedResults.Conflict(result.Error);
     }
 }
