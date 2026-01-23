@@ -1,4 +1,5 @@
 using Dash.Domain.Common;
+using Dash.Api.Common;
 using Dash.Application.Features.Authentication.DTOs;
 using Dash.Application.Features.Authentication.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -12,8 +13,11 @@ internal static class AuthEndpoints
         var group = app.MapGroup("/api/auth")
             .WithTags("Authentication");
 
-        group.MapPost("/login", LoginAsync);
-        group.MapPost("/register", RegisterAsync);
+        group.MapPost("/login", LoginAsync)
+            .AddEndpointFilter<ValidationFilter<LoginRequest>>();
+
+        group.MapPost("/register", RegisterAsync)
+            .AddEndpointFilter<ValidationFilter<RegisterRequest>>();
 
         return app;
     }
@@ -29,14 +33,14 @@ internal static class AuthEndpoints
             : TypedResults.BadRequest(result.Error);
     }
 
-    private static async Task<Results<Ok<AuthResponse>, Conflict<Error>>> RegisterAsync(
+    private static async Task<Results<Created<AuthResponse>, Conflict<Error>>> RegisterAsync(
             RegisterRequest request,
             IAuthService authService)
     {
         Result<AuthResponse> result = await authService.RegisterAsync(request);
 
         return result.IsSuccess
-            ? TypedResults.Ok(result.Value)
+            ? TypedResults.Created(uri: string.Empty, value: result.Value)
             : TypedResults.Conflict(result.Error);
     }
 }
