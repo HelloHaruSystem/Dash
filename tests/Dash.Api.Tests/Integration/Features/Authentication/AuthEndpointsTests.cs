@@ -227,4 +227,35 @@ public class AuthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
         Assert.NotNull(error);
         Assert.Equal(expectedError.Code, error?.Code);
     }
+
+    [Theory]
+    [InlineData("", "test@test.com", "Password123!")] // empty username
+    [InlineData("user", "not-an-email", "Password123!")] // Invalid Email format
+    [InlineData("user", "test@test.com", "")]            // empty password
+    public async Task Register_ShouldReturnBadRequest_WhenValidationFails(string username, string email, string password)
+    {
+        IAuthService authServiceMock = Substitute.For<IAuthService>();
+        RegisterRequest request = new RegisterRequest
+        {
+            Username = username,
+            Email = email,
+            Password = password
+        };
+
+        HttpClient client = _factory.WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureTestServices(services =>
+            {
+                services.AddScoped(_ => authServiceMock);
+            });
+        }).CreateClient();
+
+        HttpResponseMessage? response = await client.PostAsJsonAsync("/api/auth/register", request);
+
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        // Check that the fitler interrupted the request
+        await authServiceMock.DidNotReceive().RegisterAsync(Arg.Any<RegisterRequest>());
+    }
 }
