@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using Dash.Application.Features.Authentication.DTOs;
 using Dash.Application.Features.Authentication.Interfaces;
 using Dash.Domain.Common;
+using Dash.Domain.Errors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -60,7 +61,7 @@ public class AuthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
     public async Task Login_ShoulReturn_CorrectError_WhenCredentialsAreInvalid()
     {
         IAuthService authServiceMock = Substitute.For<IAuthService>();
-        Error expectedError = Dash.Domain.Errors.UserErrors.InvalidCredentials;
+        Error expectedError = UserErrors.InvalidCredentials;
 
         authServiceMock.LoginAsync(Arg.Any<LoginRequest>())
             .Returns(Result<AuthResponse>.Failure(expectedError));
@@ -161,5 +162,37 @@ public class AuthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
 
         Assert.NotNull(response);
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Register_ShouldReturnConflict_WhenUsernameAlreadyInUse()
+    {
+        IAuthService authServiceMock = Substitute.For<IAuthService>();
+        RegisterRequest request = new RegisterRequest
+        {
+            Username = "existinguser",
+            Email = "test@test.com",
+            Password = "Password123!"
+        };
+        Error expectedError = UserErrors.UsernameAlreadyInUse;
+
+        authServiceMock.RegisterAsync(Arg.Any<RegisterRequest>())
+            .Returns(Result<AuthResponse>.Failure(expectedError));
+
+        HttpClient client = _factory.WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureTestServices(services =>
+            {
+                services.AddScoped(_ => authServiceMock);
+            });
+        }).CreateClient();
+
+        HttpResponseMessage? response = await client.PostAsJsonAsync("/api/auth/register", request);
+
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        Error? error = await response.Content.ReadFromJsonAsync<Error>();
+        Assert.NotNull(error);
+        Assert.Equal(expectedError.Code, error?.Code);
     }
 }
