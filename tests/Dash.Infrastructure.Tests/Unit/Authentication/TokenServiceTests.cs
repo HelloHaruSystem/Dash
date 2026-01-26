@@ -4,7 +4,7 @@ using MsOptions = Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-namespace Dash.Infrastructure.Tests.Authentication;
+namespace Dash.Infrastructure.Tests.Unit.Authentication;
 
 public class TokenServiceTests
 {

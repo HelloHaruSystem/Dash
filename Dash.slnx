@@ -6,6 +6,7 @@
     <Project Path="src/Dash.Infrastructure/Dash.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/Dash.Api.Tests/Dash.Api.Tests.csproj" />
     <Project Path="tests/Dash.Application.Tests/Dash.Application.Tests.csproj" />
     <Project Path="tests/Dash.Infrastructure.Tests/Dash.Infrastructure.Tests.csproj" />
   </Folder>

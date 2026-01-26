@@ -7,7 +7,7 @@ using Dash.Application.Features.Authentication.Services;
 using Dash.Application.Features.Authentication.DTOs;
 using NSubstitute;
 
-namespace Dash.Application.Tests.Features.Authentication.Services;
+namespace Dash.Application.Tests.Unit.Features.Authentication.Services;
 
 public class AuthServiceTests
 {
