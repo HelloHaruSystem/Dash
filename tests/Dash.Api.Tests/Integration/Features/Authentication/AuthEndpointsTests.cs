@@ -58,7 +58,7 @@ public class AuthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
-    public async Task Login_ShoulReturn_CorrectError_WhenCredentialsAreInvalid()
+    public async Task Login_ShouldReturn_CorrectError_WhenCredentialsAreInvalid()
     {
         IAuthService authServiceMock = Substitute.For<IAuthService>();
         Error expectedError = UserErrors.InvalidCredentials;
@@ -89,7 +89,7 @@ public class AuthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
     [InlineData("   ", "password123")] // whitespace identifier
     [InlineData("long_id", "")] // empty password
     [InlineData("too_long_id", "password123")]
-    public async Task Login_ShouldReturnBadRequest_WehnDataAnnotationsFail(string identifier, string password)
+    public async Task Login_ShouldReturnBadRequest_WhenDataAnnotationsFail(string identifier, string password)
     {
         IAuthService authServiceMock = Substitute.For<IAuthService>();
 
@@ -234,6 +234,9 @@ public class AuthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
     [InlineData("", "test@test.com", "Password123!")] // empty username
     [InlineData("user", "not-an-email", "Password123!")] // Invalid Email format
     [InlineData("user", "test@test.com", "")]            // empty password
+    [InlineData("username with spaces", "test@test.com", "Password123!")] // username with spaces
+    [InlineData("ab", "test@test.com", "Password123!")] // username too short
+    [InlineData("user", "test@test.com", "short")] // password too short
     public async Task Register_ShouldReturnBadRequest_WhenValidationFails(string username, string email, string password)
     {
         IAuthService authServiceMock = Substitute.For<IAuthService>();
