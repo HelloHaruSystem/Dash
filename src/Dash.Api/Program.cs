@@ -27,3 +27,7 @@ app.MapAuthEndpoints();
 app.MapGet("/", () => TypedResults.Ok("Hello, World!"));
 
 app.Run();
+
+// Make this class public instead of internal
+// So it is testable
+public partial class Program { }
