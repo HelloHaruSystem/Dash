@@ -56,6 +56,33 @@ public class AuthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
         Assert.Equal(expectedResponse.Token, result.Token);
     }
 
+    [Fact]
+    public async Task Login_ShoulReturn_CorrectError_WhenCredentialsAreInvalid()
+    {
+        IAuthService authServiceMock = Substitute.For<IAuthService>();
+        Error expectedError = Dash.Domain.Errors.UserErrors.InvalidCredentials;
+
+        authServiceMock.LoginAsync(Arg.Any<LoginRequest>())
+            .Returns(Result<AuthResponse>.Failure(expectedError));
+
+        HttpClient client = _factory.WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureTestServices(services =>
+            {
+                services.AddScoped(_ => authServiceMock);
+            });
+        }).CreateClient();
+
+        HttpResponseMessage? response = await client.PostAsJsonAsync(
+                "/api/auth/login", new LoginRequest { Identifier = "user", Password = "123" });
+
+        Assert.NotNull(response);
+        Error? error = await response.Content.ReadFromJsonAsync<Error>();
+        Assert.NotNull(error);
+        Assert.Equal(expectedError.Code, error.Code);
+        Assert.Equal(expectedError.Description, error.Description);
+    }
+
     [Theory]
     [InlineData("", "password123")] // Empty Identifier
     [InlineData("   ", "password123")] // whitespace identifier
