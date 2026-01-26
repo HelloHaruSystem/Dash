@@ -126,4 +126,40 @@ public class AuthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
         Assert.NotNull(problemDetails);
         Assert.NotEmpty(problemDetails.Errors);
     }
+
+    [Fact]
+    public async Task Register_ShouldReturnCreated_WhenDataIsValid()
+    {
+        IAuthService authServiceMock = Substitute.For<IAuthService>();
+        RegisterRequest request = new RegisterRequest
+        {
+            Username = "newuser",
+            Email = "newuser@example.com",
+            Password = "newsecurepassword"
+        };
+        AuthResponse expectedResponse = new AuthResponse
+        {
+            Id = Guid.NewGuid(),
+            Username = "newuser",
+            Email = "newuser@example.com",
+            Token = "newtoken"
+        };
+
+        authServiceMock.RegisterAsync(Arg.Any<RegisterRequest>())
+            .Returns(Result<AuthResponse>.Success(expectedResponse));
+
+
+        HttpClient client = _factory.WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureTestServices(services =>
+            {
+                services.AddScoped(_ => authServiceMock);
+            });
+        }).CreateClient();
+
+        HttpResponseMessage? response = await client.PostAsJsonAsync("/api/auth/register", request);
+
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+    }
 }
