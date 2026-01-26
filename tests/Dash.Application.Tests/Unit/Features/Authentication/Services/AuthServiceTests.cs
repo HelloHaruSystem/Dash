@@ -32,6 +32,10 @@ public class AuthServiceTests
     {
         User fakeUser = User.Create("testuser", "test@test.com", "fake-test-password-hash");
         string fakeToken = "fake-jwt-token";
+
+
+
+
         LoginRequest request = new()
         {
             Identifier = fakeUser.Username,

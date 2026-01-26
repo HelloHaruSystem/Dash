@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using Dash.Application.Features.Authentication.DTOs;
 using Dash.Application.Features.Authentication.Interfaces;
 using Dash.Domain.Common;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.TestHost;
@@ -53,5 +54,49 @@ public class AuthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
         Assert.NotNull(result);
         Assert.Equal(expectedResponse.Id, result.Id);
         Assert.Equal(expectedResponse.Token, result.Token);
+    }
+
+    [Theory]
+    [InlineData("", "password123")] // Empty Identifier
+    [InlineData("   ", "password123")] // whitespace identifier
+    [InlineData("long_id", "")] // empty password
+    [InlineData("too_long_id", "password123")]
+    public async Task Login_ShouldReturnBadRequest_WehnDataAnnotationsFail(string identifier, string password)
+    {
+        IAuthService authServiceMock = Substitute.For<IAuthService>();
+
+        string testIdentifier = identifier == "too_long_id"
+            ? new string('a', 256)
+            : identifier;
+
+        LoginRequest request = new LoginRequest
+        {
+            Identifier = testIdentifier,
+            Password = password
+        };
+
+        HttpClient client = _factory.WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureTestServices(services =>
+            {
+                services.AddScoped(_ => authServiceMock);
+            });
+        }).CreateClient();
+
+        HttpResponseMessage? response = await client.PostAsJsonAsync("/api/auth/login", request);
+
+        Assert.NotNull(response);
+
+        // Correct status status code
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        // Check that the rrequest was stopped by the fitler
+        // so that it never touched the service logic
+        await authServiceMock.DidNotReceive().LoginAsync(Arg.Any<LoginRequest>());
+
+        // Check that the response is a validation problem (error dictionary)
+        HttpValidationProblemDetails? problemDetails = await response.Content.ReadFromJsonAsync<HttpValidationProblemDetails>();
+        Assert.NotNull(problemDetails);
+        Assert.NotEmpty(problemDetails.Errors);
     }
 }
