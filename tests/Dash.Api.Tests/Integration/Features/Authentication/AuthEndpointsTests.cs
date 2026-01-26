@@ -195,4 +195,36 @@ public class AuthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
         Assert.NotNull(error);
         Assert.Equal(expectedError.Code, error?.Code);
     }
+
+    [Fact]
+    public async Task Register_ShouldReturnConflict_WhenEmailAlreadyInUse()
+    {
+        IAuthService authServiceMock = Substitute.For<IAuthService>();
+        RegisterRequest request = new RegisterRequest
+        {
+            Username = "newuser",
+            Email = "used@test.com",
+            Password = "Password123!"
+        };
+        Error expectedError = UserErrors.EmailAlreadyInUse;
+
+        authServiceMock.RegisterAsync(Arg.Any<RegisterRequest>())
+            .Returns(Result<AuthResponse>.Failure(expectedError));
+
+        HttpClient client = _factory.WithWebHostBuilder(builder =>
+        {
+            builder.ConfigureTestServices(services =>
+            {
+                services.AddScoped(_ => authServiceMock);
+            });
+        }).CreateClient();
+
+        HttpResponseMessage? response = await client.PostAsJsonAsync("/api/auth/register", request);
+
+        Assert.NotNull(response);
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        Error? error = await response.Content.ReadFromJsonAsync<Error>();
+        Assert.NotNull(error);
+        Assert.Equal(expectedError.Code, error?.Code);
+    }
 }
