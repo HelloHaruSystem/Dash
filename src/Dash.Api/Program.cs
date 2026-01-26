@@ -1,3 +1,4 @@
+using Dash.Api.Features.Authentication;
 using Dash.Infrastructure.DependencyInjection;
 using Dash.Application.DependencyInjection;
 
@@ -20,7 +21,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRouting();
 
+app.MapAuthEndpoints();
 app.MapGet("/", () => TypedResults.Ok("Hello, World!"));
 
 app.Run();
