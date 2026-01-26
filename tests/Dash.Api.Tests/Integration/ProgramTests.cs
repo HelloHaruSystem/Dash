@@ -15,8 +15,9 @@ public class ProgramTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact]
     public async Task Root_Should_returnHelloWorld()
     {
-        var response = await _client.GetAsync("/");
+        HttpResponseMessage? response = await _client.GetAsync("/");
 
+        Assert.NotNull(response);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         string content = await response.Content.ReadAsStringAsync();
         Assert.Contains("Hello, World!", content);
