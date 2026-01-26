@@ -194,6 +194,7 @@ public class AuthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
         Error? error = await response.Content.ReadFromJsonAsync<Error>();
         Assert.NotNull(error);
         Assert.Equal(expectedError.Code, error?.Code);
+        Assert.Equal(expectedError.Description, error?.Description);
     }
 
     [Fact]
@@ -226,6 +227,7 @@ public class AuthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
         Error? error = await response.Content.ReadFromJsonAsync<Error>();
         Assert.NotNull(error);
         Assert.Equal(expectedError.Code, error?.Code);
+        Assert.Equal(expectedError.Description, error?.Description);
     }
 
     [Theory]
