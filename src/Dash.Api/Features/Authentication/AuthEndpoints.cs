@@ -3,6 +3,8 @@ using Dash.Api.Common;
 using Dash.Application.Features.Authentication.DTOs;
 using Dash.Application.Features.Authentication.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Dash.Application.Common.Persistence;
+using System.Security.Claims;
 
 namespace Dash.Api.Features.Authentication;
 
@@ -18,6 +20,9 @@ internal static class AuthEndpoints
 
         group.MapPost("/register", RegisterAsync)
             .AddEndpointFilter<ValidationFilter<RegisterRequest>>();
+
+        group.MapGet("/test-me", GetCurrentUserAsync)
+            .RequireAuthorization();
 
         return app;
     }
@@ -42,5 +47,35 @@ internal static class AuthEndpoints
         return result.IsSuccess
             ? TypedResults.Created(uri: string.Empty, value: result.Value)
             : TypedResults.Conflict(result.Error);
+    }
+
+    private static async Task<Results<Ok<AuthResponse>, NotFound>> GetCurrentUserAsync(
+            HttpContext context,
+            IUserRepository userRepository)
+    {
+        // Extract user Id From JWT
+        var userIdString = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid userId))
+        {
+            return TypedResults.NotFound();
+        }
+
+        // Fetch user from database
+        var user = await userRepository.GetByIdAsync(userId);
+
+        if (user is null)
+        {
+            return TypedResults.NotFound();
+        }
+
+        // return user data
+        return TypedResults.Ok(new AuthResponse
+        {
+            Id = user.Id,
+            Username = user.Username,
+            Email = user.Email,
+            Token = string.Empty // no new token
+        });
     }
 }
