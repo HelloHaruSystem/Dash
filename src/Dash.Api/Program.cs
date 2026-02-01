@@ -21,7 +21,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseRouting();
+// app.UseRouting(); // built in with Minimal API
+// app.UseCors();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapAuthEndpoints();
 app.MapGet("/", () => TypedResults.Ok("Hello, World!"));
