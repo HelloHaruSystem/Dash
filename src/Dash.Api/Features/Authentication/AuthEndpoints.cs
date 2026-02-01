@@ -22,7 +22,7 @@ internal static class AuthEndpoints
         return app;
     }
 
-    private static async Task<Results<Ok<AuthResponse>, BadRequest<Error>>> LoginAsync(
+    private static async Task<Results<Ok<AuthResponse>, JsonHttpResult<Error>>> LoginAsync(
         LoginRequest request,
         IAuthService authService)
     {
@@ -30,7 +30,7 @@ internal static class AuthEndpoints
 
         return result.IsSuccess
             ? TypedResults.Ok(result.Value)
-            : TypedResults.BadRequest(result.Error);
+            : TypedResults.Json(result.Error, statusCode: ErrorMapper.ToStatusCode(result.Error));
     }
 
     private static async Task<Results<Created<AuthResponse>, Conflict<Error>>> RegisterAsync(
