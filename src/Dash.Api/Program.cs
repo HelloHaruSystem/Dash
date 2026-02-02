@@ -10,9 +10,16 @@ builder.Services.AddInfrastructure(builder.Configuration);
 // Add Application (like services)
 builder.Services.AddApplication();
 
+// Add problem details for error responses
+builder.Services.AddProblemDetails();
+
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+// Exception handler important to be first in middleware pipeline
+// THis cathces all unhandled exceptions and returns responses
+app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
