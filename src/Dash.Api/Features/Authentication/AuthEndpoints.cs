@@ -5,6 +5,7 @@ using Dash.Application.Features.Authentication.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Dash.Application.Common.Persistence;
 using System.Security.Claims;
+using Dash.Domain.Entities;
 
 namespace Dash.Api.Features.Authentication;
 
@@ -54,7 +55,7 @@ internal static class AuthEndpoints
             IUserRepository userRepository)
     {
         // Extract user Id From JWT
-        var userIdString = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        string? userIdString = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out Guid userId))
         {
@@ -62,7 +63,7 @@ internal static class AuthEndpoints
         }
 
         // Fetch user from database
-        var user = await userRepository.GetByIdAsync(userId);
+        User? user = await userRepository.GetByIdAsync(userId);
 
         if (user is null)
         {

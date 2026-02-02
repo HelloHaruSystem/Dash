@@ -26,6 +26,11 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
+else
+{
+    // use HSTS in production
+    app.UseHsts();
+}
 
 app.UseHttpsRedirection();
 // app.UseRouting(); // built in with Minimal API
