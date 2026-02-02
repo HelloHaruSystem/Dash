@@ -5,16 +5,19 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 
 namespace Dash.Infrastructure.Authentication;
 
 public sealed class TokenService : ITokenService
 {
     private readonly JwtOptions _options;
+    private readonly ILogger<TokenService> _logger;
 
-    public TokenService(IOptions<JwtOptions> options)
+    public TokenService(IOptions<JwtOptions> options, ILogger<TokenService> logger)
     {
         _options = options.Value;
+        _logger = logger;
     }
 
     public string GenerateToken(Guid Id, string username, string email)
@@ -33,13 +36,15 @@ public sealed class TokenService : ITokenService
         SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         // Create Tokens
-        var token = new JwtSecurityToken(
+        JwtSecurityToken token = new JwtSecurityToken(
             issuer: _options.Issuer,
             audience: _options.Audience,
             claims: claims,
             expires: DateTime.UtcNow.AddMinutes(_options.ExpiresInMinutes),
             signingCredentials: credentials
         );
+
+        _logger.LogInformation("Generated JWT Token for User: {Username}, Expires: {ExpireaAt}", username, token.ValidTo);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
