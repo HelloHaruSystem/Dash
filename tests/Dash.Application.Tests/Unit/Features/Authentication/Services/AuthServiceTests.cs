@@ -5,6 +5,7 @@ using Dash.Application.Common.Persistence;
 using Dash.Application.Features.Authentication.Interfaces;
 using Dash.Application.Features.Authentication.Services;
 using Dash.Application.Features.Authentication.DTOs;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 
 namespace Dash.Application.Tests.Unit.Features.Authentication.Services;
@@ -15,6 +16,7 @@ public class AuthServiceTests
     private readonly IPasswordService _passwordService;
     private readonly ITokenService _tokenService;
     private readonly AuthService _authService;
+    private readonly ILogger<AuthService> _logger;
 
     public AuthServiceTests()
     {
@@ -22,9 +24,15 @@ public class AuthServiceTests
         _userRepository = Substitute.For<IUserRepository>();
         _passwordService = Substitute.For<IPasswordService>();
         _tokenService = Substitute.For<ITokenService>();
+        _logger = Substitute.For<ILogger<AuthService>>();
 
         // Create the auth service with the mocks
-        _authService = new AuthService(_userRepository, _passwordService, _tokenService);
+        _authService = new AuthService(
+                _userRepository,
+                _passwordService,
+                _tokenService,
+                _logger
+        );
     }
 
     [Fact]

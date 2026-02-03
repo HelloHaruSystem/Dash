@@ -69,6 +69,10 @@ public static class ServiceCollectionExtensions
         // Add authentication Services
         services.AddSingleton<ITokenService, TokenService>();
 
+        // Add Health Checks
+        services.AddHealthChecks()
+            .AddDbContextCheck<DashDbContext>();
+
         return services;
     }
 

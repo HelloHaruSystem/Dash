@@ -39,7 +39,12 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapAuthEndpoints();
+
+// Endpoints
+// Root
 app.MapGet("/", () => TypedResults.Ok("Hello, World!"));
+// Health Check
+app.MapHealthChecks("/Health");
 
 app.Run();
 

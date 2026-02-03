@@ -3,12 +3,15 @@ using Dash.Infrastructure.Options;
 using MsOptions = Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.Extensions.Logging;
+using NSubstitute;
 
 namespace Dash.Infrastructure.Tests.Unit.Authentication;
 
 public class TokenServiceTests
 {
     private readonly TokenService _tokenService;
+    private readonly ILogger<TokenService> _logger;
 
     public TokenServiceTests()
     {
@@ -23,8 +26,9 @@ public class TokenServiceTests
 
         // Wrap it in IOptions
         var options = MsOptions.Options.Create(jwtOptions);
+        _logger = Substitute.For<ILogger<TokenService>>();
 
-        _tokenService = new TokenService(options);
+        _tokenService = new TokenService(options, _logger);
     }
 
     [Fact]
