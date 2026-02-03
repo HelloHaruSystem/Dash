@@ -1,4 +1,5 @@
 using Dash.Api.Features.Authentication;
+using Dash.Api.Extensions;
 using Dash.Infrastructure.DependencyInjection;
 using Dash.Application.DependencyInjection;
 
@@ -9,6 +10,9 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 // Add Application (like services)
 builder.Services.AddApplication();
+
+// Add Rate Limiting
+builder.Services.AddApiRateLimiting();
 
 // Add problem details for error responses
 builder.Services.AddProblemDetails();
@@ -33,8 +37,11 @@ else
 }
 
 app.UseHttpsRedirection();
+
 // app.UseRouting(); // built in with Minimal API
+app.UseRateLimiter();
 // app.UseCors();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
