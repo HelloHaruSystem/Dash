@@ -17,13 +17,16 @@ internal static class AuthEndpoints
             .WithTags("Authentication");
 
         group.MapPost("/login", LoginAsync)
-            .AddEndpointFilter<ValidationFilter<LoginRequest>>();
+            .AddEndpointFilter<ValidationFilter<LoginRequest>>()
+            .RequireRateLimiting("api");
 
         group.MapPost("/register", RegisterAsync)
-            .AddEndpointFilter<ValidationFilter<RegisterRequest>>();
+            .AddEndpointFilter<ValidationFilter<RegisterRequest>>()
+            .RequireRateLimiting("api");
 
         group.MapGet("/test-me", GetCurrentUserAsync)
-            .RequireAuthorization();
+            .RequireAuthorization()
+            .RequireRateLimiting("api");
 
         return app;
     }

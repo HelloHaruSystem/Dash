@@ -49,7 +49,8 @@ app.MapAuthEndpoints();
 
 // Endpoints
 // Root
-app.MapGet("/", () => TypedResults.Ok("Hello, World!"));
+app.MapGet("/", () => TypedResults.Ok("Hello, World!"))
+    .RequireRateLimiting("api");
 // Health Check
 app.MapHealthChecks("/Health");
 
