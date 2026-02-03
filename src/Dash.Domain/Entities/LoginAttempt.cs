@@ -26,7 +26,7 @@ public sealed class LoginAttempt
     /// <summary>
     /// Static factory to record a login attempt
     /// Only sets unique data
-    /// </summar>
+    /// </summary>
     public static LoginAttempt Create(Guid userId, bool isSuccess, string? ipAddress, string? userAgent = null)
     {
         return new LoginAttempt
