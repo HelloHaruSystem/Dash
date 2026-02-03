@@ -1,5 +1,6 @@
 using Dash.Api.Features.Authentication;
 using Dash.Api.Extensions;
+using Dash.Api.Common;
 using Dash.Infrastructure.DependencyInjection;
 using Dash.Application.DependencyInjection;
 
@@ -50,7 +51,7 @@ app.MapAuthEndpoints();
 // Endpoints
 // Root
 app.MapGet("/", () => TypedResults.Ok("Hello, World!"))
-    .RequireRateLimiting("api");
+    .RequireRateLimiting(RateLimitPolicies.Api);
 // Health Check
 app.MapHealthChecks("/Health");
 
