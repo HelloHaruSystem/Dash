@@ -18,11 +18,11 @@ internal static class AuthEndpoints
 
         group.MapPost("/login", LoginAsync)
             .AddEndpointFilter<ValidationFilter<LoginRequest>>()
-            .RequireRateLimiting(RateLimitPolicies.Register);
+            .RequireRateLimiting(RateLimitPolicies.Login);
 
         group.MapPost("/register", RegisterAsync)
             .AddEndpointFilter<ValidationFilter<RegisterRequest>>()
-            .RequireRateLimiting(RateLimitPolicies.Login);
+            .RequireRateLimiting(RateLimitPolicies.Register);
 
         group.MapGet("/test-me", GetCurrentUserAsync)
             .RequireAuthorization()
