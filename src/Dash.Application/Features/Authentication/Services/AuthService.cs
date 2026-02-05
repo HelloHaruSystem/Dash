@@ -28,7 +28,10 @@ public sealed class AuthService : IAuthService
         _logger = logger;
     }
 
-    public async Task<Result<AuthResponse>> LoginAsync(LoginRequest request)
+    public async Task<Result<AuthResponse>> LoginAsync(
+            LoginRequest request,
+            string? ipAddress,
+            string? userAgent)
     {
         _logger.LogInformation("Login attempt for identifier: {Identifier}", request.Identifier);
 

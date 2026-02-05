@@ -33,9 +33,13 @@ internal static class AuthEndpoints
 
     private static async Task<Results<Ok<AuthResponse>, JsonHttpResult<Error>>> LoginAsync(
         LoginRequest request,
-        IAuthService authService)
+        IAuthService authService,
+        HttpContext context)
     {
-        Result<AuthResponse> result = await authService.LoginAsync(request);
+        string? ipAddress = context.Connection.RemoteIpAddress?.ToString();
+        string? userAgent = context.Request.Headers.UserAgent.ToString();
+
+        Result<AuthResponse> result = await authService.LoginAsync(request, ipAddress, userAgent);
 
         return result.IsSuccess
             ? TypedResults.Ok(result.Value)

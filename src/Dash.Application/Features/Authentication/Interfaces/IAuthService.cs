@@ -13,5 +13,5 @@ public interface IAuthService
     /// <summary>
     /// Handles the business logic for validating credentials and logging in.
     /// </summary>
-    public Task<Result<AuthResponse>> LoginAsync(LoginRequest request);
+    public Task<Result<AuthResponse>> LoginAsync(LoginRequest request, string? ipAddress, string? userAgent);
 }
