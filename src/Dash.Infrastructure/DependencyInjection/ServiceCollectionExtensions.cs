@@ -65,6 +65,7 @@ public static class ServiceCollectionExtensions
 
         // Add Repositories
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<ILoginAttemptRepository, LoginAttemptRepository>();
 
         // Add authentication Services
         services.AddSingleton<ITokenService, TokenService>();
