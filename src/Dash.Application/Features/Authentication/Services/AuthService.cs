@@ -17,6 +17,9 @@ public sealed class AuthService : IAuthService
     private readonly ITokenService _tokenService;
     private readonly ILogger<AuthService> _logger;
 
+    private const int MaxFailedAttempts = 5;
+    private static readonly TimeSpan LockoutWindow = TimeSpan.FromMinutes(15);
+
     public AuthService(
             IUserRepository userRepository,
             ILoginAttemptRepository loginAttemptRepository,
@@ -47,14 +50,33 @@ public sealed class AuthService : IAuthService
             return Result<AuthResponse>.Failure(UserErrors.InvalidCredentials);
         }
 
+        // Check if account is locked
+        DateTime lockoutCutoff = DateTime.UtcNow - LockoutWindow;
+        int failedAttempts = await _loginAttemptRepository.CountRecentFailedAttemptsAsync(user.Id, lockoutCutoff);
+        if (failedAttempts >= MaxFailedAttempts)
+        {
+            _logger.LogWarning("Login failed: Account is locked for user: {Username}", user.Username);
+            return Result<AuthResponse>.Failure(UserErrors.AccountIsLocked);
+        }
+
         // Check if password matches with the user found
         // If not a match send the same InvalidCredentials Errors
         // To not give any information
         if (!await _passwordService.VerifyPasswordAsync(request.Password, user.PasswordHash))
         {
             _logger.LogWarning("Login failed: Invalid password for user: {Username}", user.Username);
+            await _loginAttemptRepository.AddAsync(
+                LoginAttempt.Create(user.Id, false, ipAddress, userAgent));
+            await _loginAttemptRepository.SaveChangesAsync();
+
             return Result<AuthResponse>.Failure(UserErrors.InvalidCredentials);
         }
+
+        // save successful LoginAttempt
+        await _loginAttemptRepository.AddAsync(
+            LoginAttempt.Create(user.Id, true, ipAddress, userAgent));
+
+        await _loginAttemptRepository.SaveChangesAsync();
 
         // Generate token
         string token = _tokenService.GenerateToken(user.Id, user.Username, user.Email);
