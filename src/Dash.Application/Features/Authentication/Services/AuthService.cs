@@ -12,17 +12,20 @@ namespace Dash.Application.Features.Authentication.Services;
 public sealed class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
+    private readonly ILoginAttemptRepository _loginAttemptRepository;
     private readonly IPasswordService _passwordService;
     private readonly ITokenService _tokenService;
     private readonly ILogger<AuthService> _logger;
 
     public AuthService(
             IUserRepository userRepository,
+            ILoginAttemptRepository loginAttemptRepository,
             IPasswordService passwordService,
             ITokenService tokenService,
             ILogger<AuthService> logger)
     {
         _userRepository = userRepository;
+        _loginAttemptRepository = loginAttemptRepository;
         _passwordService = passwordService;
         _tokenService = tokenService;
         _logger = logger;

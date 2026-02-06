@@ -15,6 +15,8 @@ internal static class ErrorMapper
                 => StatusCodes.Status409Conflict,
             _ when error == UserErrors.EmailAlreadyInUse
                 => StatusCodes.Status409Conflict,
+            _ when error == UserErrors.AccountIsLocked
+                => StatusCodes.Status429TooManyRequests,
             // default to 400 bad request
             _ => StatusCodes.Status400BadRequest
         }
