@@ -2,6 +2,7 @@ using Dash.Application.Common.Persistence;
 using Dash.Domain.Entities;
 using Dash.Infrastructure.Data;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
 
 namespace Dash.Infrastructure.Persistence.Repositories;
 
@@ -18,38 +19,67 @@ public sealed class LoginAttemptRepository : ILoginAttemptRepository
         _logger = logger;
     }
 
-    public Task AddAsync(LoginAttempt loginAttempt)
+    public async Task AddAsync(LoginAttempt loginAttempt)
     {
-        throw new NotImplementedException();
+        _logger.LogDebug("Recording login attempt for UserId: {UserId}, Success: {IsSuccessful}",
+                loginAttempt.UserId, loginAttempt.IsSuccessful);
+
+        await _context.LoginAttempts.AddAsync(loginAttempt);
     }
 
-    public Task<int> CountRecentFailedAttemptsAsync(Guid userId, DateTime since)
+    public async Task<int> CountRecentFailedAttemptsAsync(Guid userId, DateTime since)
     {
-        throw new NotImplementedException();
+        _logger.LogDebug("Counting failed attempts for UserId: {UserId} since: {Since}", userId, since);
+
+        return await _context.LoginAttempts
+            .CountAsync(attempt =>
+                    attempt.UserId == userId &&
+                    !attempt.IsSuccessful &&
+                    attempt.AttemptedAt >= since);
     }
 
-    public Task<IEnumerable<LoginAttempt>> GetAttemptsAsync(int skip, int take)
+    public async Task<IEnumerable<LoginAttempt>> GetAttemptsAsync(int skip, int take)
     {
-        throw new NotImplementedException();
+        _logger.LogDebug("Fetching all login attempts with Offset: {Offset} and Limit: {limit}", skip, take);
+
+        return await _context.LoginAttempts
+            .OrderByDescending(attempt => attempt.AttemptedAt)
+            .Skip(skip)
+            .Take(take)
+            .ToListAsync();
     }
 
-    public Task<LoginAttempt?> GetByIdAsync(Guid id)
+    public async Task<LoginAttempt?> GetByIdAsync(Guid id)
     {
-        throw new NotImplementedException();
+        _logger.LogDebug("Fetching login attempt by ID: {LoginAttemptId}", id);
+        return await _context.LoginAttempts.FindAsync(id);
     }
 
-    public Task<IEnumerable<LoginAttempt>> GetByUserIdAsync(Guid userId)
+    public async Task<IEnumerable<LoginAttempt>> GetByUserIdAsync(Guid userId)
     {
-        throw new NotImplementedException();
+        _logger.LogDebug("Fetching login attempts by UserId: {UserId}", userId);
+        return await _context.LoginAttempts
+            .Where(attempt => attempt.UserId == userId)
+            .OrderByDescending(attempt => attempt.AttemptedAt)
+            .ToListAsync();
     }
 
-    public Task<IEnumerable<LoginAttempt>> GetFailedAttemptsAsync(int skip, int take)
+    public async Task<IEnumerable<LoginAttempt>> GetFailedAttemptsAsync(int skip, int take)
     {
-        throw new NotImplementedException();
+        _logger.LogDebug("Fetching failed login attempts with Offset: {Offset} and Limit: {Limit}", skip, take);
+
+        return await _context.LoginAttempts
+            .Where(attempt => !attempt.IsSuccessful)
+            .OrderByDescending(attempt => attempt.AttemptedAt)
+            .Skip(skip)
+            .Take(take)
+            .ToListAsync();
     }
 
-    public Task SaveChangesAsync()
+    public async Task SaveChangesAsync()
     {
-        throw new NotImplementedException();
+        _logger.LogDebug("Saving changes to database");
+        int changes = await _context.SaveChangesAsync();
+        _logger.LogDebug("Saved {ChangeCount} changes to database", changes);
     }
 }
