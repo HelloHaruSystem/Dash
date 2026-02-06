@@ -13,6 +13,7 @@ namespace Dash.Application.Tests.Unit.Features.Authentication.Services;
 public class AuthServiceTests
 {
     private readonly IUserRepository _userRepository;
+    private readonly ILoginAttemptRepository _loginAttemptRepository;
     private readonly IPasswordService _passwordService;
     private readonly ITokenService _tokenService;
     private readonly AuthService _authService;
@@ -22,6 +23,7 @@ public class AuthServiceTests
     {
         // create mocks
         _userRepository = Substitute.For<IUserRepository>();
+        _loginAttemptRepository = Substitute.For<ILoginAttemptRepository>();
         _passwordService = Substitute.For<IPasswordService>();
         _tokenService = Substitute.For<ITokenService>();
         _logger = Substitute.For<ILogger<AuthService>>();
@@ -29,6 +31,7 @@ public class AuthServiceTests
         // Create the auth service with the mocks
         _authService = new AuthService(
                 _userRepository,
+                _loginAttemptRepository,
                 _passwordService,
                 _tokenService,
                 _logger
@@ -41,9 +44,6 @@ public class AuthServiceTests
         User fakeUser = User.Create("testuser", "test@test.com", "fake-test-password-hash");
         string fakeToken = "fake-jwt-token";
 
-
-
-
         LoginRequest request = new()
         {
             Identifier = fakeUser.Username,
@@ -54,7 +54,7 @@ public class AuthServiceTests
         _passwordService.VerifyPasswordAsync("PlainTextPassword123!", fakeUser.PasswordHash).Returns(true);
         _tokenService.GenerateToken(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>()).Returns(fakeToken);
 
-        Result<AuthResponse> result = await _authService.LoginAsync(request);
+        Result<AuthResponse> result = await _authService.LoginAsync(request, "127.0.0.1", "TestAgent");
 
         Assert.True(result.IsSuccess);
         Assert.NotNull(result.Value);
@@ -73,7 +73,7 @@ public class AuthServiceTests
             Password = "PlainTextPassword123!"
         };
 
-        Result<AuthResponse> result = await _authService.LoginAsync(request);
+        Result<AuthResponse> result = await _authService.LoginAsync(request, null, null);
 
         Assert.True(result.IsFailure);
         Assert.Null(result.Value);
@@ -93,12 +93,76 @@ public class AuthServiceTests
 
         _userRepository.GetByIdentifierAsync(Arg.Any<string>()).Returns(fakeUser);
 
-        Result<AuthResponse> result = await _authService.LoginAsync(request);
+        Result<AuthResponse> result = await _authService.LoginAsync(request, "127.0.0.1", "TestAgent");
 
         Assert.True(result.IsFailure);
         Assert.Null(result.Value);
 
         Assert.Equal(UserErrors.InvalidCredentials, result.Error);
+    }
+
+    [Fact]
+    public async Task LoginAsync_WhenAccountIsLocked_ShouldReturnAccountIsLockedError()
+    {
+        User fakeUser = User.Create("testuser", "test@test.com", "fake-test-password-hash");
+        LoginRequest request = new()
+        {
+            Identifier = fakeUser.Username,
+            Password = "PlainTextPassword123!"
+        };
+
+        _userRepository.GetByIdentifierAsync(Arg.Any<string>()).Returns(fakeUser);
+        _loginAttemptRepository.CountRecentFailedAttemptsAsync(fakeUser.Id, Arg.Any<DateTime>()).Returns(5);
+
+        Result<AuthResponse> result = await _authService.LoginAsync(request, "127.0.0.1", "TestAgent");
+
+        Assert.True(result.IsFailure);
+        Assert.Equal(UserErrors.AccountIsLocked, result.Error);
+    }
+
+    [Fact]
+    public async Task LoginAsync_WhenPasswordIsWrong_ShouldRecordFailedAttempt()
+    {
+        User fakeUser = User.Create("testuser", "test@test.com", "fake-test-password-hash");
+        LoginRequest request = new()
+        {
+            Identifier = fakeUser.Username,
+            Password = "WrongPassword123!"
+        };
+
+        _userRepository.GetByIdentifierAsync(Arg.Any<string>()).Returns(fakeUser);
+        _loginAttemptRepository.CountRecentFailedAttemptsAsync(fakeUser.Id, Arg.Any<DateTime>()).Returns(0);
+        _passwordService.VerifyPasswordAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(false);
+
+        await _authService.LoginAsync(request, "127.0.0.1", "TestAgent");
+
+        await _loginAttemptRepository.Received(1).AddAsync(Arg.Is<LoginAttempt>(a =>
+            a.UserId == fakeUser.Id &&
+            !a.IsSuccessful));
+        await _loginAttemptRepository.Received(1).SaveChangesAsync();
+    }
+
+    [Fact]
+    public async Task LoginAsync_WhenLoginSucceeds_ShouldRecordSuccessfulAttempt()
+    {
+        User fakeUser = User.Create("testuser", "test@test.com", "fake-test-password-hash");
+        LoginRequest request = new()
+        {
+            Identifier = fakeUser.Username,
+            Password = "CorrectPassword123!"
+        };
+
+        _userRepository.GetByIdentifierAsync(Arg.Any<string>()).Returns(fakeUser);
+        _loginAttemptRepository.CountRecentFailedAttemptsAsync(fakeUser.Id, Arg.Any<DateTime>()).Returns(0);
+        _passwordService.VerifyPasswordAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
+        _tokenService.GenerateToken(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>()).Returns("fake-token");
+
+        await _authService.LoginAsync(request, "127.0.0.1", "TestAgent");
+
+        await _loginAttemptRepository.Received(1).AddAsync(Arg.Is<LoginAttempt>(a =>
+            a.UserId == fakeUser.Id &&
+            a.IsSuccessful));
+        await _loginAttemptRepository.Received(1).SaveChangesAsync();
     }
 
     [Fact]
