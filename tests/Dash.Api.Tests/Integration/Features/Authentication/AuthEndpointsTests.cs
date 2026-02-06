@@ -36,7 +36,7 @@ public class AuthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
             Token = "mock-jwt-token"
         };
 
-        authServiceMock.LoginAsync(Arg.Any<LoginRequest>())
+        authServiceMock.LoginAsync(Arg.Any<LoginRequest>(), Arg.Any<string?>(), Arg.Any<string?>())
             .Returns(Result<AuthResponse>.Success(expectedResponse));
 
         HttpClient client = _factory.WithWebHostBuilder(builder =>
@@ -63,7 +63,7 @@ public class AuthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
         IAuthService authServiceMock = Substitute.For<IAuthService>();
         Error expectedError = UserErrors.InvalidCredentials;
 
-        authServiceMock.LoginAsync(Arg.Any<LoginRequest>())
+        authServiceMock.LoginAsync(Arg.Any<LoginRequest>(), Arg.Any<string?>(), Arg.Any<string?>())
             .Returns(Result<AuthResponse>.Failure(expectedError));
 
         HttpClient client = _factory.WithWebHostBuilder(builder =>
@@ -120,7 +120,7 @@ public class AuthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
 
         // Check that the rrequest was stopped by the fitler
         // so that it never touched the service logic
-        await authServiceMock.DidNotReceive().LoginAsync(Arg.Any<LoginRequest>());
+        await authServiceMock.DidNotReceive().LoginAsync(Arg.Any<LoginRequest>(), Arg.Any<string?>(), Arg.Any<string?>());
 
         // Check that the response is a validation problem (error dictionary)
         HttpValidationProblemDetails? problemDetails = await response.Content.ReadFromJsonAsync<HttpValidationProblemDetails>();
