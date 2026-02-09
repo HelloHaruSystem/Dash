@@ -13,6 +13,7 @@ public sealed class DashDbContext : DbContext
 
     public DbSet<User> Users => Set<User>();
     public DbSet<LoginAttempt> LoginAttempts => Set<LoginAttempt>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
@@ -52,6 +53,25 @@ public sealed class DashDbContext : DbContext
             entity.HasIndex(e => e.AttemptedAt);
 
             entity.Property(e => e.AttemptedAt)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP");
+        });
+
+        // RefreshToken configurations
+        modelBuilder.Entity<RefreshToken>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+
+            entity.HasOne(e => e.User)
+                .WithMany(u => u.RefreshTokens)
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(e => e.Token)
+                .IsUnique();
+
+            entity.HasIndex(e => e.UserId);
+
+            entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
     }

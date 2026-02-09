@@ -49,6 +49,7 @@ public sealed class User
 
     // Navigation properties
     public ICollection<LoginAttempt> LoginAttempts { get; private set; } = [];
+    public ICollection<RefreshToken> RefreshTokens { get; private set; } = [];
 
     // Private constructor
     private User() { }
