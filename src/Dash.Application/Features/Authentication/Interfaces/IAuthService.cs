@@ -8,7 +8,7 @@ public interface IAuthService
     /// <summary>
     /// Handles the business logic for creating a new user account.
     /// </summary>
-    public Task<Result<AuthResponse>> RegisterAsync(RegisterRequest request);
+    public Task<Result<AuthResponse>> RegisterAsync(RegisterRequest request, string? ipAddress, string? userAgent);
 
     /// <summary>
     /// Handles the business logic for validating credentials and logging in.

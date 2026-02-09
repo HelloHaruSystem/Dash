@@ -84,8 +84,15 @@ public sealed class AuthService : IAuthService
         // Generate token
         string token = _tokenService.GenerateToken(user.Id, user.Username, user.Email);
 
+        // Generate refresh token
+        RefreshToken refreshToken = _tokenService.GenerateRefreshToken(user.Id, ipAddress, userAgent);
+
+        // Save refresh token
+        await _refreshTokenRepository.AddAsync(refreshToken);
+        await _refreshTokenRepository.SaveChangesAsync();
+
         // Map To AuthResponse
-        AuthResponse response = user.ToAuthResponse(token);
+        AuthResponse response = user.ToAuthResponse(token, refreshToken.Token);
 
         _logger.LogInformation("User {Username} logged in successfully", user.Username);
 
@@ -93,7 +100,10 @@ public sealed class AuthService : IAuthService
         return Result<AuthResponse>.Success(response);
     }
 
-    public async Task<Result<AuthResponse>> RegisterAsync(RegisterRequest request)
+    public async Task<Result<AuthResponse>> RegisterAsync(
+            RegisterRequest request,
+            string? ipAddress,
+            string? userAgent)
     {
         _logger.LogInformation("New register attempt with the email: {Email}", request.Email);
 
@@ -126,8 +136,15 @@ public sealed class AuthService : IAuthService
         // Generate token
         string token = _tokenService.GenerateToken(newUser.Id, newUser.Username, newUser.Email);
 
+        // Generate refresh token
+        RefreshToken refreshToken = _tokenService.GenerateRefreshToken(newUser.Id, ipAddress, userAgent);
+
+        // Save refresh token
+        await _refreshTokenRepository.AddAsync(refreshToken);
+        await _refreshTokenRepository.SaveChangesAsync();
+
         // Map to AuthResponse
-        AuthResponse response = newUser.ToAuthResponse(token);
+        AuthResponse response = newUser.ToAuthResponse(token, refreshToken.Token);
 
         _logger.LogInformation("New user {Username} created successfully", newUser.Username);
 
