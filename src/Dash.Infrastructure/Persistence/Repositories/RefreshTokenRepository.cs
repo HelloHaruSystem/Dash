@@ -36,10 +36,6 @@ public sealed class RefreshTokenRepository : IRefreshTokenRepository
         {
             _logger.LogWarning("Failed to fetch Token: {TokenString}", token);
         }
-        else
-        {
-            _logger.LogInformation("Fetched Token: {TokenString}", token);
-        }
 
         return fetchedToken;
     }
@@ -48,7 +44,7 @@ public sealed class RefreshTokenRepository : IRefreshTokenRepository
     {
         _logger.LogDebug("Fetching all refresh tokens By ID: {UserId}", userId);
         return await _context.RefreshTokens
-            .Where(token => token.UserId == userId)
+            .Where(token => token.UserId == userId && token.RevokedAt == null && token.ExpiresAt > DateTime.UtcNow)
             .OrderByDescending(token => token.ExpiresAt)
             .ToListAsync();
     }
