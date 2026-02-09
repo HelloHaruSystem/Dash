@@ -1,7 +1,9 @@
+using Dash.Domain.Entities;
 using Dash.Application.Features.Authentication.Interfaces;
 using Dash.Infrastructure.Options;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
@@ -47,5 +49,18 @@ public sealed class TokenService : ITokenService
         _logger.LogInformation("Generated JWT Token for User: {Username}, Expires: {ExpireaAt}", username, token.ValidTo);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    public RefreshToken GenerateRefreshToken(Guid userId, string? ipAddress, string? deviceInfo)
+    {
+        TimeSpan lifetime = TimeSpan.FromDays(_options.RefreshTokenExpiresInDays);
+        string token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
+
+        RefreshToken refreshToken = RefreshToken.Create(userId, token, ipAddress, deviceInfo, lifetime);
+
+        _logger.LogInformation("Generated Refresh Token for UserId: {UserId}, Expires: {ExpiresAt}",
+                    userId, refreshToken.ExpiresAt);
+
+        return refreshToken;
     }
 }

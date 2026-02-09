@@ -1,8 +1,5 @@
-using System.Security.Cryptography;
-
 namespace Dash.Domain.Entities;
 
-// TODO: refactor so that it doesn't contain too much logic
 public class RefreshToken
 {
     public Guid Id { get; private set; }
@@ -32,12 +29,12 @@ public class RefreshToken
     /// Static factory to record a RefreshToken
     /// Only sets unique data
     /// </summary>
-    public static RefreshToken Create(Guid userId, string? ipAddress, string? deviceInfo, TimeSpan lifetime)
+    public static RefreshToken Create(Guid userId, string token, string? ipAddress, string? deviceInfo, TimeSpan lifetime)
     {
         return new RefreshToken
         {
             Id = Guid.NewGuid(),
-            Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+            Token = token,
             UserId = userId,
             ExpiresAt = DateTime.UtcNow + lifetime,
             RevokedAt = null,

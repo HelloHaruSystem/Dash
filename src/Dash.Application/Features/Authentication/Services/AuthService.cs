@@ -13,6 +13,7 @@ public sealed class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
     private readonly ILoginAttemptRepository _loginAttemptRepository;
+    private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly IPasswordService _passwordService;
     private readonly ITokenService _tokenService;
     private readonly ILogger<AuthService> _logger;
@@ -23,12 +24,14 @@ public sealed class AuthService : IAuthService
     public AuthService(
             IUserRepository userRepository,
             ILoginAttemptRepository loginAttemptRepository,
+            IRefreshTokenRepository refreshTokenRepository,
             IPasswordService passwordService,
             ITokenService tokenService,
             ILogger<AuthService> logger)
     {
         _userRepository = userRepository;
         _loginAttemptRepository = loginAttemptRepository;
+        _refreshTokenRepository = refreshTokenRepository;
         _passwordService = passwordService;
         _tokenService = tokenService;
         _logger = logger;
