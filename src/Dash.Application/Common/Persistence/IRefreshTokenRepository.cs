@@ -9,8 +9,8 @@ public interface IRefreshTokenRepository
     public Task<IEnumerable<RefreshToken>> GetActiveTokensAsync(Guid userId);
 
     // Save Commands
-    public Task CreateAsync(RefreshToken refreshToken);
-    public Task RevokeAllByUserIdAsync(Guid userId);
+    public Task AddAsync(RefreshToken refreshToken);
+    //public Task RevokeAllByUserIdAsync(Guid userId); // move to service
 
     // Save
     public Task SaveChangesAsync();
