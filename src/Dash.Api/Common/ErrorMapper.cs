@@ -11,6 +11,8 @@ internal static class ErrorMapper
         {
             _ when error == UserErrors.InvalidCredentials
                 => StatusCodes.Status401Unauthorized,
+            _ when error == UserErrors.InvalidRefreshToken
+                => StatusCodes.Status401Unauthorized,
             _ when error == UserErrors.UsernameAlreadyInUse
                 => StatusCodes.Status409Conflict,
             _ when error == UserErrors.EmailAlreadyInUse

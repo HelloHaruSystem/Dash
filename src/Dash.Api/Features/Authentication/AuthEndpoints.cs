@@ -24,6 +24,10 @@ internal static class AuthEndpoints
             .AddEndpointFilter<ValidationFilter<RegisterRequest>>()
             .RequireRateLimiting(RateLimitPolicies.Register);
 
+        group.MapPost("/refresh", RefreshAsync)
+            .AddEndpointFilter<ValidationFilter<RefreshRequest>>()
+            .RequireRateLimiting(RateLimitPolicies.Api);
+
         group.MapGet("/test-me", GetCurrentUserAsync)
             .RequireAuthorization()
             .RequireRateLimiting(RateLimitPolicies.Api);
@@ -59,6 +63,22 @@ internal static class AuthEndpoints
         return result.IsSuccess
             ? TypedResults.Created(uri: string.Empty, value: result.Value)
             : TypedResults.Conflict(result.Error);
+    }
+
+    private static async Task<Results<Ok<AuthResponse>, JsonHttpResult<Error>>> RefreshAsync(
+            RefreshRequest request,
+            IAuthService authService,
+            HttpContext context
+            )
+    {
+        string? ipAddress = context.Connection.RemoteIpAddress?.ToString();
+        string? userAgent = context.Request.Headers.UserAgent.ToString();
+
+        Result<AuthResponse> result = await authService.RefreshAsync(request, ipAddress, userAgent);
+
+        return result.IsSuccess
+            ? TypedResults.Ok(result.Value)
+            : TypedResults.Json(result.Error, statusCode: ErrorMapper.ToStatusCode(result.Error));
     }
 
     private static async Task<Results<Ok<AuthResponse>, NotFound>> GetCurrentUserAsync(
