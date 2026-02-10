@@ -21,4 +21,8 @@ public static class UserErrors
     public static readonly Error AccountIsLocked = new(
         "User.AccountIsLocked",
         "Too many login attempts. Please try again later.");
+
+    public static readonly Error InvalidRefreshToken = new(
+        "User.InvalidRefreshToken",
+        "The provided refresh token is invalid.");
 }
