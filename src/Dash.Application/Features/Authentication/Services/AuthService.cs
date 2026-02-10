@@ -151,4 +151,47 @@ public sealed class AuthService : IAuthService
         // Return success Result
         return Result<AuthResponse>.Success(response);
     }
+
+    public async Task<Result<AuthResponse>> RefreshAsync(
+            RefreshRequest request,
+            string? ipAddress,
+            string? userAgent)
+    {
+        // Find the refresh token
+        RefreshToken? existingToken = await _refreshTokenRepository.GetByTokenAsync(request.RefreshToken);
+
+        // Validate that it exists and is active
+        if (existingToken is null || !existingToken.IsActive)
+        {
+            _logger.LogWarning("Refresh failed: Invalid or epired refresh token");
+            return Result<AuthResponse>.Failure(UserErrors.InvalidRefreshToken);
+        }
+
+        // Get the user
+        User? user = await _userRepository.GetByIdAsync(existingToken.UserId);
+
+        if (user is null)
+        {
+            _logger.LogWarning("Refresh failed: User not found for token");
+            return Result<AuthResponse>.Failure(UserErrors.InvalidCredentials);
+        }
+
+        // Revoke the old token
+        existingToken.Revoke();
+
+        // Generate new token
+        string token = _tokenService.GenerateToken(user.Id, user.Username, user.Email);
+        RefreshToken newRefreshToken = _tokenService.GenerateRefreshToken(user.Id, ipAddress, userAgent);
+
+        // add the new token and save changes
+        await _refreshTokenRepository.AddAsync(newRefreshToken);
+        await _refreshTokenRepository.SaveChangesAsync();
+
+        // Create response
+        AuthResponse response = user.ToAuthResponse(token, newRefreshToken.Token);
+
+        _logger.LogInformation("Tokens refreshed for User: {Username}", user.Username);
+
+        return Result<AuthResponse>.Success(response);
+    }
 }

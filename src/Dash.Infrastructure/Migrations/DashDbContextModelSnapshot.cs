@@ -73,10 +73,6 @@ namespace Dash.Infrastructure.Migrations
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-                    b.Property<string>("DeviceInfo")
-                        .HasColumnType("TEXT")
-                        .HasColumnName("device_info");
-
                     b.Property<DateTime>("ExpiresAt")
                         .HasColumnType("TEXT")
                         .HasColumnName("expires_at");
@@ -93,6 +89,10 @@ namespace Dash.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT")
                         .HasColumnName("token");
+
+                    b.Property<string>("UserAgent")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("user_agent");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("TEXT")

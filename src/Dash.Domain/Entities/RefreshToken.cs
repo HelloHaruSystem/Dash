@@ -16,7 +16,7 @@ public class RefreshToken
 
     public DateTime CreatedAt { get; private set; }
 
-    public string? DeviceInfo { get; private set; }
+    public string? UserAgent { get; private set; }
 
     public string? IpAddress { get; private set; }
 
@@ -29,7 +29,7 @@ public class RefreshToken
     /// Static factory to record a RefreshToken
     /// Only sets unique data
     /// </summary>
-    public static RefreshToken Create(Guid userId, string token, string? ipAddress, string? deviceInfo, TimeSpan lifetime)
+    public static RefreshToken Create(Guid userId, string token, string? ipAddress, string? userAgent, TimeSpan lifetime)
     {
         return new RefreshToken
         {
@@ -39,7 +39,7 @@ public class RefreshToken
             ExpiresAt = DateTime.UtcNow + lifetime,
             RevokedAt = null,
             CreatedAt = DateTime.UtcNow,
-            DeviceInfo = deviceInfo,
+            UserAgent = userAgent,
             IpAddress = ipAddress
         };
     }

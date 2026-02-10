@@ -11,14 +11,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Dash.Infrastructure.Migrations
 {
     [DbContext(typeof(DashDbContext))]
-    [Migration("20260120122451_InitialCreate")]
+    [Migration("20260210075644_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "10.0.1");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.2");
 
             modelBuilder.Entity("Dash.Domain.Entities.LoginAttempt", b =>
                 {
@@ -61,6 +61,57 @@ namespace Dash.Infrastructure.Migrations
                         .HasDatabaseName("i_x_login_attempts_user_id");
 
                     b.ToTable("login_attempts");
+                });
+
+            modelBuilder.Entity("Dash.Domain.Entities.RefreshToken", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("expires_at");
+
+                    b.Property<string>("IpAddress")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("ip_address");
+
+                    b.Property<DateTime?>("RevokedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("revoked_at");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("token");
+
+                    b.Property<string>("UserAgent")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("user_agent");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("p_k_refresh_tokens");
+
+                    b.HasIndex("Token")
+                        .IsUnique()
+                        .HasDatabaseName("i_x_refresh_tokens_token");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("i_x_refresh_tokens_user_id");
+
+                    b.ToTable("refresh_tokens");
                 });
 
             modelBuilder.Entity("Dash.Domain.Entities.User", b =>
@@ -166,9 +217,23 @@ namespace Dash.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Dash.Domain.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("Dash.Domain.Entities.User", "User")
+                        .WithMany("RefreshTokens")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("f_k_refresh_tokens__users_user_id");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Dash.Domain.Entities.User", b =>
                 {
                     b.Navigation("LoginAttempts");
+
+                    b.Navigation("RefreshTokens");
                 });
 #pragma warning restore 612, 618
         }

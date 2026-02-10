@@ -12,5 +12,5 @@ public interface ITokenService
     /// <summary>
     /// Generates a Refresh token
     /// </summary>
-    public RefreshToken GenerateRefreshToken(Guid userId, string? ipAddress, string? deviceInfo);
+    public RefreshToken GenerateRefreshToken(Guid userId, string? ipAddress, string? userAgent);
 }

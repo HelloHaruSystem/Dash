@@ -51,12 +51,12 @@ public sealed class TokenService : ITokenService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public RefreshToken GenerateRefreshToken(Guid userId, string? ipAddress, string? deviceInfo)
+    public RefreshToken GenerateRefreshToken(Guid userId, string? ipAddress, string? userAgent)
     {
         TimeSpan lifetime = TimeSpan.FromDays(_options.RefreshTokenExpiresInDays);
         string token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
 
-        RefreshToken refreshToken = RefreshToken.Create(userId, token, ipAddress, deviceInfo, lifetime);
+        RefreshToken refreshToken = RefreshToken.Create(userId, token, ipAddress, userAgent, lifetime);
 
         _logger.LogInformation("Generated Refresh Token for UserId: {UserId}, Expires: {ExpiresAt}",
                     userId, refreshToken.ExpiresAt);
