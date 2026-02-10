@@ -14,6 +14,7 @@ public class AuthServiceTests
 {
     private readonly IUserRepository _userRepository;
     private readonly ILoginAttemptRepository _loginAttemptRepository;
+    private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly IPasswordService _passwordService;
     private readonly ITokenService _tokenService;
     private readonly AuthService _authService;
@@ -24,6 +25,7 @@ public class AuthServiceTests
         // create mocks
         _userRepository = Substitute.For<IUserRepository>();
         _loginAttemptRepository = Substitute.For<ILoginAttemptRepository>();
+        _refreshTokenRepository = Substitute.For<IRefreshTokenRepository>();
         _passwordService = Substitute.For<IPasswordService>();
         _tokenService = Substitute.For<ITokenService>();
         _logger = Substitute.For<ILogger<AuthService>>();
@@ -32,6 +34,7 @@ public class AuthServiceTests
         _authService = new AuthService(
                 _userRepository,
                 _loginAttemptRepository,
+                _refreshTokenRepository,
                 _passwordService,
                 _tokenService,
                 _logger
@@ -180,7 +183,7 @@ public class AuthServiceTests
         _passwordService.HashPasswordAsync(Arg.Any<string>()).Returns("fake-hashed-password");
         _tokenService.GenerateToken(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>()).Returns("fake-token");
 
-        Result<AuthResponse> result = await _authService.RegisterAsync(request);
+        Result<AuthResponse> result = await _authService.RegisterAsync(request, "127.0.0.1", "TestAgent");
 
         Assert.True(result.IsSuccess);
         Assert.NotNull(result.Value);
@@ -202,7 +205,7 @@ public class AuthServiceTests
 
         _userRepository.ExistsByUsernameAsync(Arg.Any<string>()).Returns(true);
 
-        Result<AuthResponse> result = await _authService.RegisterAsync(request);
+        Result<AuthResponse> result = await _authService.RegisterAsync(request, "127.0.0.1", "TestAgent");
 
         Assert.True(result.IsFailure);
         Assert.Null(result.Value);
@@ -223,7 +226,7 @@ public class AuthServiceTests
         _userRepository.ExistsByUsernameAsync(Arg.Any<string>()).Returns(false);
         _userRepository.ExistsByEmailAsync(Arg.Any<string>()).Returns(true);
 
-        Result<AuthResponse> result = await _authService.RegisterAsync(request);
+        Result<AuthResponse> result = await _authService.RegisterAsync(request, "127.0.0.1", "TestAgent");
 
         Assert.True(result.IsFailure);
         Assert.Null(result.Value);

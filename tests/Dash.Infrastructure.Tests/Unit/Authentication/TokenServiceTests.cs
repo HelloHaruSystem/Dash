@@ -21,7 +21,8 @@ public class TokenServiceTests
             Secret = "test-secret-key-that-is-at-least-32-characters-long!",
             Issuer = "TestIssuer",
             Audience = "TestAudience",
-            ExpiresInMinutes = 60
+            ExpiresInMinutes = 60,
+            RefreshTokenExpiresInDays = 7
         };
 
         // Wrap it in IOptions

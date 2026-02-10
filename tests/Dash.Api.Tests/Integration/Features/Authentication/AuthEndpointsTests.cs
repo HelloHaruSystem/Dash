@@ -33,7 +33,8 @@ public class AuthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
             Id = Guid.NewGuid(),
             Username = "testuser",
             Email = "test@example.com",
-            Token = "mock-jwt-token"
+            Token = "mock-jwt-token",
+            RefreshToken = "mock-refresh-token"
         };
 
         authServiceMock.LoginAsync(Arg.Any<LoginRequest>(), Arg.Any<string?>(), Arg.Any<string?>())
@@ -143,10 +144,11 @@ public class AuthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
             Id = Guid.NewGuid(),
             Username = "newuser",
             Email = "newuser@example.com",
-            Token = "newtoken"
+            Token = "newtoken",
+            RefreshToken = "newrefreshtoken"
         };
 
-        authServiceMock.RegisterAsync(Arg.Any<RegisterRequest>())
+        authServiceMock.RegisterAsync(Arg.Any<RegisterRequest>(), Arg.Any<string?>(), Arg.Any<string?>())
             .Returns(Result<AuthResponse>.Success(expectedResponse));
 
 
@@ -176,7 +178,7 @@ public class AuthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
         };
         Error expectedError = UserErrors.UsernameAlreadyInUse;
 
-        authServiceMock.RegisterAsync(Arg.Any<RegisterRequest>())
+        authServiceMock.RegisterAsync(Arg.Any<RegisterRequest>(), Arg.Any<string?>(), Arg.Any<string?>())
             .Returns(Result<AuthResponse>.Failure(expectedError));
 
         HttpClient client = _factory.WithWebHostBuilder(builder =>
@@ -209,7 +211,7 @@ public class AuthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
         };
         Error expectedError = UserErrors.EmailAlreadyInUse;
 
-        authServiceMock.RegisterAsync(Arg.Any<RegisterRequest>())
+        authServiceMock.RegisterAsync(Arg.Any<RegisterRequest>(), Arg.Any<string?>(), Arg.Any<string?>())
             .Returns(Result<AuthResponse>.Failure(expectedError));
 
         HttpClient client = _factory.WithWebHostBuilder(builder =>
@@ -261,6 +263,6 @@ public class AuthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
         // Check that the fitler interrupted the request
-        await authServiceMock.DidNotReceive().RegisterAsync(Arg.Any<RegisterRequest>());
+        await authServiceMock.DidNotReceive().RegisterAsync(Arg.Any<RegisterRequest>(), Arg.Any<string?>(), Arg.Any<string?>());
     }
 }
