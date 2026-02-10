@@ -57,6 +57,9 @@ public class AuthServiceTests
         _passwordService.VerifyPasswordAsync("PlainTextPassword123!", fakeUser.PasswordHash).Returns(true);
         _tokenService.GenerateToken(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>()).Returns(fakeToken);
 
+        _tokenService.GenerateRefreshToken(Arg.Any<Guid>(), Arg.Any<string?>(), Arg.Any<string?>())
+            .Returns(RefreshToken.Create(fakeUser.Id, "fake-token", "127.0.0.1", "TestAgent", TimeSpan.FromDays(7)));
+
         Result<AuthResponse> result = await _authService.LoginAsync(request, "127.0.0.1", "TestAgent");
 
         Assert.True(result.IsSuccess);
@@ -160,6 +163,9 @@ public class AuthServiceTests
         _passwordService.VerifyPasswordAsync(Arg.Any<string>(), Arg.Any<string>()).Returns(true);
         _tokenService.GenerateToken(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>()).Returns("fake-token");
 
+        _tokenService.GenerateRefreshToken(Arg.Any<Guid>(), Arg.Any<string?>(), Arg.Any<string?>())
+            .Returns(RefreshToken.Create(fakeUser.Id, "fake-token", "127.0.0.1", "TestAgent", TimeSpan.FromDays(7)));
+
         await _authService.LoginAsync(request, "127.0.0.1", "TestAgent");
 
         await _loginAttemptRepository.Received(1).AddAsync(Arg.Is<LoginAttempt>(a =>
@@ -182,6 +188,9 @@ public class AuthServiceTests
         _userRepository.ExistsByEmailAsync(Arg.Any<string>()).Returns(false);
         _passwordService.HashPasswordAsync(Arg.Any<string>()).Returns("fake-hashed-password");
         _tokenService.GenerateToken(Arg.Any<Guid>(), Arg.Any<string>(), Arg.Any<string>()).Returns("fake-token");
+
+        _tokenService.GenerateRefreshToken(Arg.Any<Guid>(), Arg.Any<string?>(), Arg.Any<string?>())
+            .Returns(RefreshToken.Create(Guid.NewGuid(), "fake-token", "127.0.0.1", "TestAgent", TimeSpan.FromDays(7)));
 
         Result<AuthResponse> result = await _authService.RegisterAsync(request, "127.0.0.1", "TestAgent");
 
