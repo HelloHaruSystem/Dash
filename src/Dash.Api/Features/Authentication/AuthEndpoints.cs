@@ -48,9 +48,13 @@ internal static class AuthEndpoints
 
     private static async Task<Results<Created<AuthResponse>, Conflict<Error>>> RegisterAsync(
             RegisterRequest request,
-            IAuthService authService)
+            IAuthService authService,
+            HttpContext context)
     {
-        Result<AuthResponse> result = await authService.RegisterAsync(request);
+        string? ipAddress = context.Connection.RemoteIpAddress?.ToString();
+        string? userAgent = context.Request.Headers.UserAgent.ToString();
+
+        Result<AuthResponse> result = await authService.RegisterAsync(request, ipAddress, userAgent);
 
         return result.IsSuccess
             ? TypedResults.Created(uri: string.Empty, value: result.Value)
@@ -83,7 +87,8 @@ internal static class AuthEndpoints
             Id = user.Id,
             Username = user.Username,
             Email = user.Email,
-            Token = string.Empty // no new token
+            Token = string.Empty, // no new token
+            RefreshToken = string.Empty // no new token
         });
     }
 }
