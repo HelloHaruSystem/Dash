@@ -92,7 +92,7 @@ public sealed class AuthService : IAuthService
         await _refreshTokenRepository.SaveChangesAsync();
 
         // Map To AuthResponse
-        AuthResponse response = user.ToAuthResponse(token, refreshToken.Token);
+        AuthResponse response = user.ToAuthResponse(token);
 
         _logger.LogInformation("User {Username} logged in successfully", user.Username);
 
@@ -144,7 +144,7 @@ public sealed class AuthService : IAuthService
         await _refreshTokenRepository.SaveChangesAsync();
 
         // Map to AuthResponse
-        AuthResponse response = newUser.ToAuthResponse(token, refreshToken.Token);
+        AuthResponse response = newUser.ToAuthResponse(token);
 
         _logger.LogInformation("New user {Username} created successfully", newUser.Username);
 
@@ -153,12 +153,12 @@ public sealed class AuthService : IAuthService
     }
 
     public async Task<Result<AuthResponse>> RefreshAsync(
-            RefreshRequest request,
+            string refreshToken,
             string? ipAddress,
             string? userAgent)
     {
         // Find the refresh token
-        RefreshToken? existingToken = await _refreshTokenRepository.GetByTokenAsync(request.RefreshToken);
+        RefreshToken? existingToken = await _refreshTokenRepository.GetByTokenAsync(refreshToken);
 
         // Validate that it exists and is active
         if (existingToken is null || !existingToken.IsActive)
@@ -188,7 +188,7 @@ public sealed class AuthService : IAuthService
         await _refreshTokenRepository.SaveChangesAsync();
 
         // Create response
-        AuthResponse response = user.ToAuthResponse(token, newRefreshToken.Token);
+        AuthResponse response = user.ToAuthResponse(token);
 
         _logger.LogInformation("Tokens refreshed for User: {Username}", user.Username);
 

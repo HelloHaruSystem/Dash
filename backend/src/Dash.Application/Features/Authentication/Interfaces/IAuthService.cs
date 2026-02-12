@@ -19,5 +19,5 @@ public interface IAuthService
     /// Handles the business logic for taking a refresh token if valid then
     /// revoke the current create new tokens and return a authresponse
     /// </summary>
-    public Task<Result<AuthResponse>> RefreshAsync(RefreshRequest request, string? ipAddress, string? userAgent);
+    public Task<Result<AuthResponse>> RefreshAsync(string refreshToken, string? ipAddress, string? userAgent);
 }

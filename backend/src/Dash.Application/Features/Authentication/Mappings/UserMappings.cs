@@ -20,7 +20,7 @@ internal static class UserMappings
     /// <summary>
     /// Maps a User entity to an AuthResponse DTO
     /// </summary>
-    public static AuthResponse ToAuthResponse(this User user, string token, string refreshToken)
+    public static AuthResponse ToAuthResponse(this User user, string token)
     {
         return new AuthResponse
         {
@@ -28,7 +28,6 @@ internal static class UserMappings
             Username = user.Username,
             Email = user.Email,
             Token = token,
-            RefreshToken = refreshToken
         };
     }
 }

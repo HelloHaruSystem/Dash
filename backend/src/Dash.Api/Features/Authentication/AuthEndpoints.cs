@@ -25,7 +25,6 @@ internal static class AuthEndpoints
             .RequireRateLimiting(RateLimitPolicies.Register);
 
         group.MapPost("/refresh", RefreshAsync)
-            .AddEndpointFilter<ValidationFilter<RefreshRequest>>()
             .RequireRateLimiting(RateLimitPolicies.Api);
 
         group.MapGet("/test-me", GetCurrentUserAsync)
