@@ -42,11 +42,15 @@ internal static class AuthEndpoints
         string? ipAddress = context.Connection.RemoteIpAddress?.ToString();
         string? userAgent = context.Request.Headers.UserAgent.ToString();
 
-        Result<AuthResponse> result = await authService.LoginAsync(request, ipAddress, userAgent);
+        Result<(AuthResponse Response, RefreshToken RefreshToken)> result = await authService.LoginAsync(request, ipAddress, userAgent);
 
-        return result.IsSuccess
-            ? TypedResults.Ok(result.Value)
-            : TypedResults.Json(result.Error, statusCode: ErrorMapper.ToStatusCode(result.Error));
+        if (result.IsSuccess)
+        {
+            SetRefreshTokenCookie(context, result.Value.RefreshToken);
+            return TypedResults.Ok(result.Value.Response);
+        }
+
+        return TypedResults.Json(result.Error, statusCode: ErrorMapper.ToStatusCode(result.Error));
     }
 
     private static async Task<Results<Created<AuthResponse>, Conflict<Error>>> RegisterAsync(
@@ -57,27 +61,44 @@ internal static class AuthEndpoints
         string? ipAddress = context.Connection.RemoteIpAddress?.ToString();
         string? userAgent = context.Request.Headers.UserAgent.ToString();
 
-        Result<AuthResponse> result = await authService.RegisterAsync(request, ipAddress, userAgent);
+        Result<(AuthResponse Response, RefreshToken RefreshToken)> result = await authService.RegisterAsync(request, ipAddress, userAgent);
 
-        return result.IsSuccess
-            ? TypedResults.Created(uri: string.Empty, value: result.Value)
-            : TypedResults.Conflict(result.Error);
+        if (result.IsSuccess)
+        {
+            SetRefreshTokenCookie(context, result.Value.RefreshToken);
+            return TypedResults.Created(uri: string.Empty, value: result.Value.Response);
+        }
+
+        return TypedResults.Conflict(result.Error);
     }
 
     private static async Task<Results<Ok<AuthResponse>, JsonHttpResult<Error>>> RefreshAsync(
-            RefreshRequest request,
             IAuthService authService,
             HttpContext context
             )
     {
+        string? refreshToken = context.Request.Cookies[CookieSettings.RefreshTokenCookieName];
+
+        if (string.IsNullOrEmpty(refreshToken))
+        {
+            // FIX NOT CLEAN
+            return TypedResults.Json(
+                UserErrors.InvalidRefreshToken,
+                statusCode: ErrorMapper.ToStatusCode(UserErrors.InvalidRefreshToken));
+        }
+
         string? ipAddress = context.Connection.RemoteIpAddress?.ToString();
         string? userAgent = context.Request.Headers.UserAgent.ToString();
 
-        Result<AuthResponse> result = await authService.RefreshAsync(request, ipAddress, userAgent);
+        Result<(AuthResponse Response, RefreshToken RefreshToken)> result = await authService.RefreshAsync(refreshToken, ipAddress, userAgent);
 
-        return result.IsSuccess
-            ? TypedResults.Ok(result.Value)
-            : TypedResults.Json(result.Error, statusCode: ErrorMapper.ToStatusCode(result.Error));
+        if (result.IsSuccess)
+        {
+            SetRefreshTokenCookie(context, result.Value.RefreshToken);
+            return TypedResults.Ok(result.Value.Response);
+        }
+
+        return TypedResults.Json(result.Error, statusCode: ErrorMapper.ToStatusCode(result.Error));
     }
 
     private static async Task<Results<Ok<AuthResponse>, NotFound>> GetCurrentUserAsync(
@@ -107,7 +128,14 @@ internal static class AuthEndpoints
             Username = user.Username,
             Email = user.Email,
             Token = string.Empty, // no new token
-            RefreshToken = string.Empty // no new token
         });
+    }
+
+    private static void SetRefreshTokenCookie(HttpContext context, RefreshToken refreshToken)
+    {
+        context.Response.Cookies.Append(
+            CookieSettings.RefreshTokenCookieName,
+            refreshToken.Token,
+            CookieSettings.RefreshTokenCookieOptions(refreshToken.ExpiresAt));
     }
 }

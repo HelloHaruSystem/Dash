@@ -37,7 +37,7 @@ public sealed class AuthService : IAuthService
         _logger = logger;
     }
 
-    public async Task<Result<AuthResponse>> LoginAsync(
+    public async Task<Result<(AuthResponse Response, RefreshToken RefreshToken)>> LoginAsync(
             LoginRequest request,
             string? ipAddress,
             string? userAgent)
@@ -50,7 +50,7 @@ public sealed class AuthService : IAuthService
         if (user is null)
         {
             _logger.LogWarning("Login failed: User not found for identifier: {Identifier}", request.Identifier);
-            return Result<AuthResponse>.Failure(UserErrors.InvalidCredentials);
+            return Result<(AuthResponse, RefreshToken)>.Failure(UserErrors.InvalidCredentials);
         }
 
         // Check if account is locked
@@ -59,7 +59,7 @@ public sealed class AuthService : IAuthService
         if (failedAttempts >= MaxFailedAttempts)
         {
             _logger.LogWarning("Login failed: Account is locked for user: {Username}", user.Username);
-            return Result<AuthResponse>.Failure(UserErrors.AccountIsLocked);
+            return Result<(AuthResponse, RefreshToken)>.Failure(UserErrors.AccountIsLocked);
         }
 
         // Check if password matches with the user found
@@ -72,7 +72,7 @@ public sealed class AuthService : IAuthService
                 LoginAttempt.Create(user.Id, false, ipAddress, userAgent));
             await _loginAttemptRepository.SaveChangesAsync();
 
-            return Result<AuthResponse>.Failure(UserErrors.InvalidCredentials);
+            return Result<(AuthResponse, RefreshToken)>.Failure(UserErrors.InvalidCredentials);
         }
 
         // save successful LoginAttempt
@@ -97,10 +97,10 @@ public sealed class AuthService : IAuthService
         _logger.LogInformation("User {Username} logged in successfully", user.Username);
 
         // Return success result
-        return Result<AuthResponse>.Success(response);
+        return Result<(AuthResponse, RefreshToken)>.Success((response, refreshToken));
     }
 
-    public async Task<Result<AuthResponse>> RegisterAsync(
+    public async Task<Result<(AuthResponse Response, RefreshToken RefreshToken)>> RegisterAsync(
             RegisterRequest request,
             string? ipAddress,
             string? userAgent)
@@ -111,14 +111,14 @@ public sealed class AuthService : IAuthService
         if (await _userRepository.ExistsByUsernameAsync(request.Username))
         {
             _logger.LogWarning("Registration attempt failed username already in use: {Username}", request.Username);
-            return Result<AuthResponse>.Failure(UserErrors.UsernameAlreadyInUse);
+            return Result<(AuthResponse, RefreshToken)>.Failure(UserErrors.UsernameAlreadyInUse);
         }
 
         // Check if email already exists
         if (await _userRepository.ExistsByEmailAsync(request.Email))
         {
             _logger.LogWarning("Registration attempt failed email already in use: {Email}", request.Email);
-            return Result<AuthResponse>.Failure(UserErrors.EmailAlreadyInUse);
+            return Result<(AuthResponse, RefreshToken)>.Failure(UserErrors.EmailAlreadyInUse);
         }
 
         // Hash the password
@@ -149,10 +149,10 @@ public sealed class AuthService : IAuthService
         _logger.LogInformation("New user {Username} created successfully", newUser.Username);
 
         // Return success Result
-        return Result<AuthResponse>.Success(response);
+        return Result<(AuthResponse, RefreshToken)>.Success((response, refreshToken));
     }
 
-    public async Task<Result<AuthResponse>> RefreshAsync(
+    public async Task<Result<(AuthResponse Response, RefreshToken RefreshToken)>> RefreshAsync(
             string refreshToken,
             string? ipAddress,
             string? userAgent)
@@ -164,7 +164,7 @@ public sealed class AuthService : IAuthService
         if (existingToken is null || !existingToken.IsActive)
         {
             _logger.LogWarning("Refresh failed: Invalid or epired refresh token");
-            return Result<AuthResponse>.Failure(UserErrors.InvalidRefreshToken);
+            return Result<(AuthResponse, RefreshToken)>.Failure(UserErrors.InvalidRefreshToken);
         }
 
         // Get the user
@@ -173,7 +173,7 @@ public sealed class AuthService : IAuthService
         if (user is null)
         {
             _logger.LogWarning("Refresh failed: User not found for token");
-            return Result<AuthResponse>.Failure(UserErrors.InvalidCredentials);
+            return Result<(AuthResponse, RefreshToken)>.Failure(UserErrors.InvalidCredentials);
         }
 
         // Revoke the old token
@@ -192,6 +192,6 @@ public sealed class AuthService : IAuthService
 
         _logger.LogInformation("Tokens refreshed for User: {Username}", user.Username);
 
-        return Result<AuthResponse>.Success(response);
+        return Result<(AuthResponse, RefreshToken)>.Success((response, newRefreshToken));
     }
 }
