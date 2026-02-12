@@ -15,6 +15,9 @@ builder.Services.AddApplication();
 // Add Rate Limiting
 builder.Services.AddApiRateLimiting();
 
+// Add Cors
+builder.Services.AddApiCors(builder.Configuration);
+
 // Add problem details for error responses
 builder.Services.AddProblemDetails();
 
@@ -44,7 +47,7 @@ app.UseHttpsRedirection();
 
 // app.UseRouting(); // built in with Minimal API
 app.UseRateLimiter();
-// app.UseCors();
+app.UseCors();
 
 app.UseAuthentication();
 app.UseAuthorization();
