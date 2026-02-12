@@ -153,10 +153,17 @@ public sealed class AuthService : IAuthService
     }
 
     public async Task<Result<(AuthResponse Response, RefreshToken RefreshToken)>> RefreshAsync(
-            string refreshToken,
+            string? refreshToken,
             string? ipAddress,
             string? userAgent)
     {
+        // Validate that the token is not empty or null
+        if (string.IsNullOrEmpty(refreshToken))
+        {
+            _logger.LogWarning("Refresh token is null or empty");
+            return Result<(AuthResponse, RefreshToken)>.Failure(UserErrors.InvalidRefreshToken);
+        }
+
         // Find the refresh token
         RefreshToken? existingToken = await _refreshTokenRepository.GetByTokenAsync(refreshToken);
 

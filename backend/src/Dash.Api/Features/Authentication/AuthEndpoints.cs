@@ -1,4 +1,5 @@
 using Dash.Domain.Common;
+using Dash.Domain.Errors;
 using Dash.Api.Common;
 using Dash.Application.Features.Authentication.DTOs;
 using Dash.Application.Features.Authentication.Interfaces;
@@ -78,15 +79,6 @@ internal static class AuthEndpoints
             )
     {
         string? refreshToken = context.Request.Cookies[CookieSettings.RefreshTokenCookieName];
-
-        if (string.IsNullOrEmpty(refreshToken))
-        {
-            // FIX NOT CLEAN
-            return TypedResults.Json(
-                UserErrors.InvalidRefreshToken,
-                statusCode: ErrorMapper.ToStatusCode(UserErrors.InvalidRefreshToken));
-        }
-
         string? ipAddress = context.Connection.RemoteIpAddress?.ToString();
         string? userAgent = context.Request.Headers.UserAgent.ToString();
 

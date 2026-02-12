@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using Dash.Application.Features.Authentication.DTOs;
 using Dash.Application.Features.Authentication.Interfaces;
 using Dash.Domain.Common;
+using Dash.Domain.Entities;
 using Dash.Domain.Errors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -34,11 +35,17 @@ public class AuthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
             Username = "testuser",
             Email = "test@example.com",
             Token = "mock-jwt-token",
-            RefreshToken = "mock-refresh-token"
         };
 
+        RefreshToken expectedRefreshToken = RefreshToken.Create(
+            expectedResponse.Id,
+            "mock-refresh-token",
+            "127.0.01",
+            "TestAgent",
+            TimeSpan.FromDays(7));
+
         authServiceMock.LoginAsync(Arg.Any<LoginRequest>(), Arg.Any<string?>(), Arg.Any<string?>())
-            .Returns(Result<AuthResponse>.Success(expectedResponse));
+            .Returns(Result<(AuthResponse, RefreshToken)>.Success((expectedResponse, expectedRefreshToken)));
 
         HttpClient client = _factory.WithWebHostBuilder(builder =>
         {
@@ -64,8 +71,15 @@ public class AuthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
         IAuthService authServiceMock = Substitute.For<IAuthService>();
         Error expectedError = UserErrors.InvalidCredentials;
 
+        RefreshToken expectedRefreshToken = RefreshToken.Create(
+            Guid.NewGuid(),
+            "mock-refresh-token",
+            "127.0.01",
+            "TestAgent",
+            TimeSpan.FromDays(7));
+
         authServiceMock.LoginAsync(Arg.Any<LoginRequest>(), Arg.Any<string?>(), Arg.Any<string?>())
-            .Returns(Result<AuthResponse>.Failure(expectedError));
+            .Returns(Result<(AuthResponse, RefreshToken)>.Failure(expectedError));
 
         HttpClient client = _factory.WithWebHostBuilder(builder =>
         {
@@ -139,17 +153,24 @@ public class AuthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
             Email = "newuser@example.com",
             Password = "newsecurepassword"
         };
+
         AuthResponse expectedResponse = new AuthResponse
         {
             Id = Guid.NewGuid(),
             Username = "newuser",
             Email = "newuser@example.com",
             Token = "newtoken",
-            RefreshToken = "newrefreshtoken"
         };
 
+        RefreshToken expectedRefreshToken = RefreshToken.Create(
+            expectedResponse.Id,
+            "mock-refresh-token",
+            "127.0.01",
+            "TestAgent",
+            TimeSpan.FromDays(7));
+
         authServiceMock.RegisterAsync(Arg.Any<RegisterRequest>(), Arg.Any<string?>(), Arg.Any<string?>())
-            .Returns(Result<AuthResponse>.Success(expectedResponse));
+            .Returns(Result<(AuthResponse, RefreshToken)>.Success((expectedResponse, expectedRefreshToken)));
 
 
         HttpClient client = _factory.WithWebHostBuilder(builder =>
@@ -179,7 +200,7 @@ public class AuthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
         Error expectedError = UserErrors.UsernameAlreadyInUse;
 
         authServiceMock.RegisterAsync(Arg.Any<RegisterRequest>(), Arg.Any<string?>(), Arg.Any<string?>())
-            .Returns(Result<AuthResponse>.Failure(expectedError));
+            .Returns(Result<(AuthResponse, RefreshToken)>.Failure(expectedError));
 
         HttpClient client = _factory.WithWebHostBuilder(builder =>
         {
@@ -212,7 +233,7 @@ public class AuthEndpointsTests : IClassFixture<WebApplicationFactory<Program>>
         Error expectedError = UserErrors.EmailAlreadyInUse;
 
         authServiceMock.RegisterAsync(Arg.Any<RegisterRequest>(), Arg.Any<string?>(), Arg.Any<string?>())
-            .Returns(Result<AuthResponse>.Failure(expectedError));
+            .Returns(Result<(AuthResponse, RefreshToken)>.Failure(expectedError));
 
         HttpClient client = _factory.WithWebHostBuilder(builder =>
         {

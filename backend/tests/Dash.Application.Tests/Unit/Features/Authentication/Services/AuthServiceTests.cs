@@ -60,14 +60,13 @@ public class AuthServiceTests
         _tokenService.GenerateRefreshToken(Arg.Any<Guid>(), Arg.Any<string?>(), Arg.Any<string?>())
             .Returns(RefreshToken.Create(fakeUser.Id, "fake-token", "127.0.0.1", "TestAgent", TimeSpan.FromDays(7)));
 
-        Result<AuthResponse> result = await _authService.LoginAsync(request, "127.0.0.1", "TestAgent");
+        Result<(AuthResponse Response, RefreshToken RefreshToken)> result = await _authService.LoginAsync(request, "127.0.0.1", "TestAgent");
 
         Assert.True(result.IsSuccess);
-        Assert.NotNull(result.Value);
 
-        Assert.Equal(result.Value.Username, fakeUser.Username);
-        Assert.Equal(result.Value.Email, fakeUser.Email);
-        Assert.Equal(result.Value.Token, fakeToken);
+        Assert.Equal(result.Value.Response.Username, fakeUser.Username);
+        Assert.Equal(result.Value.Response.Email, fakeUser.Email);
+        Assert.Equal(result.Value.Response.Token, fakeToken);
     }
 
     [Fact]
@@ -79,10 +78,9 @@ public class AuthServiceTests
             Password = "PlainTextPassword123!"
         };
 
-        Result<AuthResponse> result = await _authService.LoginAsync(request, null, null);
+        Result<(AuthResponse Response, RefreshToken RefreshToken)> result = await _authService.LoginAsync(request, null, null);
 
         Assert.True(result.IsFailure);
-        Assert.Null(result.Value);
 
         Assert.Equal(UserErrors.InvalidCredentials, result.Error);
     }
@@ -99,10 +97,9 @@ public class AuthServiceTests
 
         _userRepository.GetByIdentifierAsync(Arg.Any<string>()).Returns(fakeUser);
 
-        Result<AuthResponse> result = await _authService.LoginAsync(request, "127.0.0.1", "TestAgent");
+        Result<(AuthResponse AuthResponse, RefreshToken RefreshToken)> result = await _authService.LoginAsync(request, "127.0.0.1", "TestAgent");
 
         Assert.True(result.IsFailure);
-        Assert.Null(result.Value);
 
         Assert.Equal(UserErrors.InvalidCredentials, result.Error);
     }
@@ -120,7 +117,7 @@ public class AuthServiceTests
         _userRepository.GetByIdentifierAsync(Arg.Any<string>()).Returns(fakeUser);
         _loginAttemptRepository.CountRecentFailedAttemptsAsync(fakeUser.Id, Arg.Any<DateTime>()).Returns(5);
 
-        Result<AuthResponse> result = await _authService.LoginAsync(request, "127.0.0.1", "TestAgent");
+        Result<(AuthResponse Response, RefreshToken RefreshToken)> result = await _authService.LoginAsync(request, "127.0.0.1", "TestAgent");
 
         Assert.True(result.IsFailure);
         Assert.Equal(UserErrors.AccountIsLocked, result.Error);
@@ -192,14 +189,13 @@ public class AuthServiceTests
         _tokenService.GenerateRefreshToken(Arg.Any<Guid>(), Arg.Any<string?>(), Arg.Any<string?>())
             .Returns(RefreshToken.Create(Guid.NewGuid(), "fake-token", "127.0.0.1", "TestAgent", TimeSpan.FromDays(7)));
 
-        Result<AuthResponse> result = await _authService.RegisterAsync(request, "127.0.0.1", "TestAgent");
+        Result<(AuthResponse Response, RefreshToken RefreshToken)> result = await _authService.RegisterAsync(request, "127.0.0.1", "TestAgent");
 
         Assert.True(result.IsSuccess);
-        Assert.NotNull(result.Value);
 
-        Assert.Equal(request.Username, result.Value.Username);
-        Assert.Equal(request.Email, result.Value.Email);
-        Assert.Equal("fake-token", result.Value.Token);
+        Assert.Equal(request.Username, result.Value.Response.Username);
+        Assert.Equal(request.Email, result.Value.Response.Email);
+        Assert.Equal("fake-token", result.Value.Response.Token);
     }
 
     [Fact]
@@ -214,10 +210,9 @@ public class AuthServiceTests
 
         _userRepository.ExistsByUsernameAsync(Arg.Any<string>()).Returns(true);
 
-        Result<AuthResponse> result = await _authService.RegisterAsync(request, "127.0.0.1", "TestAgent");
+        Result<(AuthResponse Response, RefreshToken RefreshToken)> result = await _authService.RegisterAsync(request, "127.0.0.1", "TestAgent");
 
         Assert.True(result.IsFailure);
-        Assert.Null(result.Value);
 
         Assert.Equal(UserErrors.UsernameAlreadyInUse, result.Error);
     }
@@ -235,10 +230,9 @@ public class AuthServiceTests
         _userRepository.ExistsByUsernameAsync(Arg.Any<string>()).Returns(false);
         _userRepository.ExistsByEmailAsync(Arg.Any<string>()).Returns(true);
 
-        Result<AuthResponse> result = await _authService.RegisterAsync(request, "127.0.0.1", "TestAgent");
+        Result<(AuthResponse Response, RefreshToken RefreshToken)> result = await _authService.RegisterAsync(request, "127.0.0.1", "TestAgent");
 
         Assert.True(result.IsFailure);
-        Assert.Null(result.Value);
 
         Assert.Equal(UserErrors.EmailAlreadyInUse, result.Error);
     }
