@@ -8,7 +8,8 @@ internal static class CookieSettings
     {
         HttpOnly = true,
         Secure = true,
-        SameSite = SameSiteMode.Strict,
+        // TODO: Set SameSite To Strict
+        SameSite = SameSiteMode.None,
         Path = "/api/auth",
         Expires = expires
     };
