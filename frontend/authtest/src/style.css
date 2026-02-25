@@ -1,19 +1,18 @@
 @import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap");
 
-/* ── Variables ── */
 :root {
-  --bg: #0f0f0f;
-  --surface: #1a1a1a;
-  --border: #2a2a2a;
-  --accent: #e8ff47;
-  --text: #f0f0f0;
-  --muted: #666;
-  --danger: #ff4f4f;
+  --bg: #f5f5f3;
+  --surface: #ffffff;
+  --border: #e0e0e0;
+  --accent: #1a1a1a;
+  --accent-hover: #333;
+  --text: #1a1a1a;
+  --muted: #888;
+  --danger: #d93025;
   --radius: 8px;
   --transition: 180ms ease;
 }
 
-/* ── Reset & Base ── */
 *,
 *::before,
 *::after {
@@ -30,19 +29,18 @@ body {
   padding: 2rem;
   display: flex;
   flex-direction: column;
-  align-items: center; /* center horizontally */
-  max-width: 800px; /* constrain width */
-  margin: 0 auto; /* center the body itself */
+  align-items: center;
   gap: 2rem;
 }
 
-/* ── Typography ── */
 h1 {
   font-size: 1rem;
   font-weight: 600;
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--muted);
+  text-align: center;
+  width: 100%;
 }
 
 h2 {
@@ -64,13 +62,14 @@ strong {
   font-weight: 500;
 }
 
-/* ── Nav ── */
 nav {
   display: flex;
   gap: 0.5rem;
   padding-bottom: 1.5rem;
-  width: 100%;
   border-bottom: 1px solid var(--border);
+  width: 100%;
+  max-width: 500px;
+  justify-content: center;
 }
 
 nav button {
@@ -92,20 +91,21 @@ nav button {
 
 nav button:hover {
   color: var(--text);
-  border-color: #444;
-  background: var(--surface);
+  border-color: #bbb;
+  background: #f0f0ee;
 }
 
-/* ── Forms ── */
 form {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 2rem;
+  width: 100%;
   max-width: 420px;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
 form p {
@@ -141,7 +141,6 @@ input:focus {
   border-color: var(--accent);
 }
 
-/* Submit button inside form */
 form button[type="submit"],
 form button:not([type]) {
   font-family: "Syne", sans-serif;
@@ -149,26 +148,26 @@ form button:not([type]) {
   font-weight: 700;
   letter-spacing: 0.05em;
   background: var(--accent);
-  color: #0f0f0f;
+  color: #ffffff;
   border: none;
   border-radius: var(--radius);
   padding: 0.75rem 1.5rem;
   cursor: pointer;
   transition:
-    opacity var(--transition),
+    background var(--transition),
     transform var(--transition);
   align-self: flex-start;
 }
 
 form button[type="submit"]:hover,
 form button:not([type]):hover {
-  opacity: 0.85;
+  background: var(--accent-hover);
   transform: translateY(-1px);
 }
 
-/* ── My Page user info ── */
 #welcome {
-  color: var(--accent);
+  color: var(--text);
+  text-align: center;
 }
 
 #user-info {
@@ -176,10 +175,12 @@ form button:not([type]):hover {
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 1.5rem;
+  width: 100%;
   max-width: 420px;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
 #user-info p {
@@ -195,7 +196,6 @@ form button:not([type]):hover {
   padding-bottom: 0;
 }
 
-/* ── no.html / error page ── */
 h2.error {
   color: var(--danger);
 }
