@@ -1,0 +1,201 @@
+@import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap");
+
+/* ── Variables ── */
+:root {
+  --bg: #0f0f0f;
+  --surface: #1a1a1a;
+  --border: #2a2a2a;
+  --accent: #e8ff47;
+  --text: #f0f0f0;
+  --muted: #666;
+  --danger: #ff4f4f;
+  --radius: 8px;
+  --transition: 180ms ease;
+}
+
+/* ── Reset & Base ── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Syne", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* center horizontally */
+  max-width: 800px; /* constrain width */
+  margin: 0 auto; /* center the body itself */
+  gap: 2rem;
+}
+
+/* ── Typography ── */
+h1 {
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.5rem;
+}
+
+p {
+  font-family: "DM Mono", monospace;
+  font-size: 0.875rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+strong {
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* ── Nav ── */
+nav {
+  display: flex;
+  gap: 0.5rem;
+  padding-bottom: 1.5rem;
+  width: 100%;
+  border-bottom: 1px solid var(--border);
+}
+
+nav button {
+  font-family: "DM Mono", monospace;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.45rem 1rem;
+  cursor: pointer;
+  transition:
+    color var(--transition),
+    border-color var(--transition),
+    background var(--transition);
+}
+
+nav button:hover {
+  color: var(--text);
+  border-color: #444;
+  background: var(--surface);
+}
+
+/* ── Forms ── */
+form {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+form p {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+label {
+  font-family: "DM Mono", monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+  font-family: "DM Mono", monospace;
+  font-size: 0.9rem;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.65rem 0.9rem;
+  outline: none;
+  transition: border-color var(--transition);
+  width: 100%;
+}
+
+input:focus {
+  border-color: var(--accent);
+}
+
+/* Submit button inside form */
+form button[type="submit"],
+form button:not([type]) {
+  font-family: "Syne", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  background: var(--accent);
+  color: #0f0f0f;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  transition:
+    opacity var(--transition),
+    transform var(--transition);
+  align-self: flex-start;
+}
+
+form button[type="submit"]:hover,
+form button:not([type]):hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+
+/* ── My Page user info ── */
+#welcome {
+  color: var(--accent);
+}
+
+#user-info {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+#user-info p {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text);
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+#user-info p:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+/* ── no.html / error page ── */
+h2.error {
+  color: var(--danger);
+}
