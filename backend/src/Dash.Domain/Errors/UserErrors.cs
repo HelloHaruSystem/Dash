@@ -8,11 +8,9 @@ public static class UserErrors
         "User.EmailInUse",
         "The provided email is already registered.");
 
-
     public static readonly Error UsernameAlreadyInUse = new(
         "User.UsernameInUse",
         "The provided username is already taken.");
-
 
     public static readonly Error InvalidCredentials = new(
         "User.InvalidCredentials",
