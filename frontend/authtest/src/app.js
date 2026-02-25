@@ -1,11 +1,11 @@
 const authBaseUrl = "https://127.0.0.1:7261/api/auth";
 
+// Access token lives in memory only
 let accessToken = null;
 
-// functions
+// -- API functions --
 const login = async (identifier, password) => {
   const loginUrl = authBaseUrl + "/login";
-  const request = new LoginRequest(identifier, password);
 
   try {
     const response = await fetch(loginUrl, {
@@ -14,7 +14,7 @@ const login = async (identifier, password) => {
         accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(request),
+      body: JSON.stringify(new LoginRequest(identifier, password)),
       credentials: "include",
     });
 
@@ -36,13 +36,16 @@ const login = async (identifier, password) => {
 
 const register = async (username, email, password) => {
   const registerUrl = authBaseUrl + "/register";
-  const request = new RegisterRequest(username, email, password);
 
   try {
     const response = await fetch(registerUrl, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(request),
+      headers: {
+        accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(new RegisterRequest(username, email, password)),
+      credentials: "include",
     });
 
     if (!response.ok) {
@@ -59,7 +62,9 @@ const register = async (username, email, password) => {
   }
 };
 
-const refreshToken = async () => {
+// Silently attempts to get a new access token using the refresh cookie.
+// Returns true if successful, false if not
+const tryRefresh = async () => {
   const refreshUrl = authBaseUrl + "/refresh";
 
   try {
@@ -71,18 +76,20 @@ const refreshToken = async () => {
     if (response.ok) {
       const data = await response.json();
       accessToken = data.token;
-      console.log("Token refreshed!");
-    } else {
-      accessToken = null;
-      window.location.href = "login.html";
+      return true;
     }
+
+    accessToken = null;
+    return false;
   } catch (err) {
     console.error(err);
+    accessToken = null;
+    return false;
   }
 };
 
 const aboutMe = async () => {
-  const aboutMeUrl = () => authBaseUrl + "/test-me";
+  const aboutMeUrl = authBaseUrl + "/test-me";
 
   try {
     const response = await fetch(aboutMeUrl, {
@@ -94,10 +101,18 @@ const aboutMe = async () => {
     });
 
     if (response.ok) {
-      // TODO Display information about the user from the response
       const data = await response.json();
-      document.getElementById("Welcome").innerText =
-        `Welcome ${data.username}!`;
+
+      const welcomeEl = document.getElementById("welcome");
+      const userInfoEl = document.getElementById("user-info");
+
+      if (welcomeEl) welcomeEl.innerText = `Welcome, ${data.username}!`;
+      if (userInfoEl)
+        userInfoEl.innerHTML = `
+        <p><strong>ID:</strong> ${data.id}</p>
+        <p><strong>Username:</strong> ${data.username}</p>
+        <p><strong>Email:</strong> ${data.email}</p>
+        `;
     } else {
       // Unauthorized, redirect to home
       window.location.href = "index.html";
@@ -108,37 +123,7 @@ const aboutMe = async () => {
   }
 };
 
-async function checkAuth() {
-  const aboutMeUrl = () => authBaseUrl + "/test/me";
-
-  try {
-    const response = await fetch(aboutMeUrl, {
-      method: "GET",
-      headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : {},
-      credentials: "include",
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      setLoggedInUI(data);
-      return true;
-    } else {
-      setLoggedOutUI();
-      return false;
-    }
-  } catch {
-    setLoggedOutUI();
-    return false;
-  }
-}
-
-function AuthResponse(id, username, email, token, refreshToken) {
-  this.id = id;
-  this.username = username;
-  this.email = email;
-  this.token = token;
-  this.refreshToken = refreshToken;
-}
+// -- Requests --
 
 function LoginRequest(identifier, password) {
   this.identifier = identifier;
@@ -151,30 +136,67 @@ function RegisterRequest(username, email, password) {
   this.password = password;
 }
 
-function Error(code, description) {
-  this.code = code;
-  this.description = description;
-}
+// -- UI helpers --
 
 function setLoggedInUI(user) {
-  document.getElementById("loginBtn")?.style.display = "none";
-  document.getElementById("registerBtn")?.style.display = "none";
-  document.getElementById("myPageBtn")?.style.display = "inline-block";
+  if (document.getElementById("loginBtn"))
+    document.getElementById("loginBtn").style.display = "none";
+  if (document.getElementById("registerBtn"))
+    document.getElementById("registerBtn").style.display = "none";
+  if (document.getElementById("myPageBtn"))
+    document.getElementById("myPageBtn").style.display = "inline-block";
 }
 
 function setLoggedOutUI() {
-  document.getElementById("loginBtn")?.style.display = "inline-block";
-  document.getElementById("registerBtn")?.style.display = "inline-block";
-  document.getElementById("myPageBtn")?.style.display = "none";
+  if (document.getElementById("loginBtn"))
+    document.getElementById("loginBtn").style.display = "inline-block";
+  if (document.getElementById("registerBtn"))
+    document.getElementById("registerBtn").style.display = "inline-block";
+  if (document.getElementById("myPageBtn"))
+    document.getElementById("myPageBtn").style.display = "none";
 }
 
-// event listeners
+// -- Bootstrap --
+
 document.addEventListener("DOMContentLoaded", async () => {
-  if (document.body.id === "home-page") {
-    await aboutMe();
+  // On every page load, try a silent refresh to restore the access token from the cookie
+  const isLoggedIn = await tryRefresh();
+
+  if (isLoggedIn) {
+    setLoggedInUI();
   } else {
-    document.addEventListener("DOMContentLoaded", () => {
-      checkAuth();
+    setLoggedOutUI();
+  }
+
+  // My Page: requires auth, load user info
+  if (document.body.id === "my-page") {
+    if (!isLoggedIn) {
+      window.location.href = "index.html";
+      return;
+    }
+    await aboutMe();
+  }
+
+  // Login form
+  const loginForm = document.getElementById("login-form");
+  if (loginForm) {
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const identifier = document.getElementById("identifier").value;
+      const password = document.getElementById("password").value;
+      await login(identifier, password);
+    });
+  }
+
+  // Register form
+  const registerForm = document.getElementById("register-form");
+  if (registerForm) {
+    registerForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const username = document.getElementById("username").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      await register(username, email, password);
     });
   }
 });
