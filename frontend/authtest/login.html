@@ -11,17 +11,23 @@
     <h1>Dash Simple Auth Test</h1>
 
     <nav>
-      <button onclick="location.href='index.html'">Home</button>
-      <button id="loginBtn" onclick="location.href='login.html'">Login</button>
-      <button id="registerBtn" onclick="location.href='register.html'">Register</button>
-      <button id="myPageBtn" onclick="location.href='mypage.html'">My Page</button>
+      <button onclick="location.href = 'index.html'">Home</button>
+      <button id="loginBtn" onclick="location.href = 'login.html'">
+        Login
+      </button>
+      <button id="registerBtn" onclick="location.href = 'register.html'">
+        Register
+      </button>
+      <button id="myPageBtn" onclick="location.href = 'mypage.html'">
+        My Page
+      </button>
     </nav>
 
-    <form action="" method="">
+    <form id="login-form">
       <h2>Login</h2>
       <p>
-        <label for="username/email">Username/Email:</label>
-        <input type="text" name="username/email" id="username/email" required />
+        <label for="identifier">Username/Email:</label>
+        <input type="text" name="identifier" id="identifier" required />
       </p>
       <p>
         <label for="password">Password:</label>

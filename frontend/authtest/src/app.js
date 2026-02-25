@@ -82,7 +82,7 @@ const refreshToken = async () => {
 };
 
 const aboutMe = async () => {
-  const aboutMeUrl = () => authBaseUrl + "/test/me";
+  const aboutMeUrl = () => authBaseUrl + "/test-me";
 
   try {
     const response = await fetch(aboutMeUrl, {
